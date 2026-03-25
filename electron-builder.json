@@ -9,20 +9,16 @@
 
   "publish": [
     {
-      "provider": "github"
+      "provider": "github",
+      "releaseType" : "release"
     }
   ],
 
   "directories": {
     "output": "dist",
-    "buildResources": "assets",
+    "buildResources": "build",
     "app": "."
   },
-
-  "files": [
-    "out/**/*",
-    "package.json"
-  ],
 
   "extraResources": [
     {
@@ -33,11 +29,12 @@
   ],
 
   "mac": {
+    "icon" : "build/icon.icns",
     "category": "public.app-category.productivity",
     "target": [
-      { "target": "dmg", "arch": ["x64"] },
-      { "target": "dmg", "arch": ["arm64"] },
-      { "target": "dmg", "arch": ["universal"] }
+      {"target": "dmg", "arch":["x64"]},
+      {"target": "dmg", "arch":["universal"]},
+      {"target": "dmg", "arch":["arm64"]}
     ]
   },
 
@@ -49,12 +46,28 @@
   },
 
   "win": {
+    "icon" : "build/icon.ico",
     "target": [
       {
         "target": "nsis",
-        "arch": ["x64"]
+        "arch": [
+          "x64",
+          "ia32"
+        ]
+      },
+      {
+         "target" : "portable",
+         "arch" : [
+           "x64",
+           "ia32"
+         ]
       }
     ]
+  },
+
+  "portable": {
+    "artifactName": "${productName}-Portable-${version}-${arch}.${ext}",
+    "requestExecutionLevel": "user"
   },
 
   "nsis": {
@@ -64,9 +77,12 @@
   },
 
   "linux": {
-    "icon": "assets",
+    "icon": "build/icon.png",
     "category": "Utility",
-    "maintainer": "Luiz Henrique <luiz@example.com>",
-    "target": ["AppImage", "deb"]
+    "maintainer": "Luiz Henrique <lhrds0113@proton.me>",
+    "target": [
+    { "target": "AppImage", "arch": ["x64"] },
+    { "target": "deb", "arch": ["x64"] }
+  ]
   }
 }
