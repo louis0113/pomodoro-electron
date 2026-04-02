@@ -5,9 +5,7 @@ import ButtonReload from './Buttons/ButtonReload'
 import ButtonForceReload from './Buttons/ButtonReload'
 import ButtonDebug from './Buttons/ButtonDebug'
 import ButtonHelp from './Buttons/ButtonHelp'
-import ButtonZoomIn from './Buttons/ButtonZoomIn'
-import ButtonZoomOut from './Buttons/ButtonZoomOut'
-import ButtonZoomReset from './Buttons/ButtonZoomReset'
+import ButtonZoom from './Buttons/ButtonZoom'
 import ButtonFullScreen from './Buttons/ButtonFullScreen'
 import ButtonQuit from './Buttons/ButtonQuit'
 import ButtonSettings from './Buttons/ButtonSettings'
@@ -20,9 +18,7 @@ function Window() {
         <ButtonReload />
         <ButtonForceReload />
         <ButtonDebug />
-        <ButtonZoomIn />
-        <ButtonZoomOut />
-        <ButtonZoomReset />
+        <ButtonZoom />
         <ButtonFullScreen />
         <ButtonHelp />
         <ButtonSettings />

@@ -348,3 +348,40 @@
   animation: fadeIn 0.4s ease 0.1s both;
   transition: var(--transition-theme);
 }
+
+.button-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.button-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 140px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  list-style: none;
+  padding: 4px 0;
+  margin: 4px 0 0;
+  z-index: 1000;
+}
+
+.button-menu-item {
+  width: 100%;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.button-menu-item:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--color-accent);
+}
