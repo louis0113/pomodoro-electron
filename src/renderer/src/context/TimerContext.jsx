@@ -4,12 +4,22 @@ import { useSound } from '../hooks/useSound'
 const TimerContext = createContext(null)
 
 export function TimerProvider({ children }) {
-  // --- Estados de Configuração ---
+  // --- Estados de Configuração e Persistência ---
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'pomodoro')
   const [minutes, setMinutes] = useState(() => localStorage.getItem('minutes') || '25:00:5:00')
   const [loops, setLoops] = useState(() => Number(localStorage.getItem('loops')) || 1)
 
-  // --- Estados do Cronômetro ---
+  // --- Estado do Histórico (Necessário para o componente History) ---
+  const [history, setHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem('pomodoro-history')
+      return saved ? JSON.parse(saved) : {}
+    } catch {
+      return {}
+    }
+  })
+
+  // --- Estados de Controle do Cronômetro ---
   const [phase, setPhase] = useState('idle') // idle, focus, break, done
   const [currentLoop, setCurrentLoop] = useState(0)
   const [remaining, setRemaining] = useState(25 * 60)
@@ -18,38 +28,58 @@ export function TimerProvider({ children }) {
   const [message, setMessage] = useState('Configure e inicie sua sessão')
   const [batteryAlert, setBatteryAlert] = useState(false)
 
-  // --- Referências e Hooks ---
   const intervalRef = useRef(null)
-  const stateRef = useRef({}) // Helper para acessar estado atualizado dentro de intervalos
+  const stateRef = useRef({})
+
+  // Atalhos para as APIs do Electron
+  const api = typeof window !== 'undefined' ? window.widgetAPI : null
+  const notify = typeof window !== 'undefined' ? window.notifyAPI : null
+  const themeAPI = typeof window !== 'undefined' ? window.themeAPI : null
   const playSound = useSound()
 
-  // Atalhos para as APIs do Electron (Preload)
-  const api = window.widgetAPI
-  const notify = window.notifyAPI
-  const themeAPI = window.themeAPI
-
-  // --- Helpers ---
+  // --- Funções Auxiliares ---
   const parseTime = useCallback((val) => {
     const parts = val.split(':').map(Number)
-    // Formato esperado: MM:SS:MM:SS (Foco : Pausa)
-    return {
-      focus: (parts[0] * 60) + (parts[1] || 0),
-      brk: (parts[2] * 60) + (parts[3] || 0)
+    if (parts.length === 4) {
+      return {
+        focus: parts[0] * 60 + (parts[1] || 0),
+        brk: parts[2] * 60 + (parts[3] || 0)
+      }
     }
+    return { focus: 25 * 60, brk: 5 * 60 }
   }, [])
 
-  // --- Efeitos de Sincronização (IPC & Storage) ---
-
-  // 1. Recebe mudanças de outras janelas (ex: aba de Configurações)
-  useEffect(() => {
-    themeAPI?.onSettings((data) => {
-      if (data.theme) setTheme(data.theme)
-      if (data.minutes) setMinutes(data.minutes)
-      if (data.loops !== undefined) setLoops(Number(data.loops))
+  const addHistoryEntry = useCallback(() => {
+    const today = new Date().toISOString().split('T')[0]
+    setHistory((prev) => {
+      const newHist = { ...prev, [today]: (prev[today] || 0) + 1 }
+      localStorage.setItem('pomodoro-history', JSON.stringify(newHist))
+      return newHist
     })
-  }, [themeAPI])
+  }, [])
 
-  // 2. Persiste e propaga mudanças locais
+  // --- Efeitos de Sincronização e IPC ---
+
+  // ESCUTA as mudanças vindas da janela Config
+  useEffect(() => {
+    if (themeAPI?.onSettings) {
+      themeAPI.onSettings((data) => {
+        if (data.theme) setTheme(data.theme)
+        if (data.minutes) {
+          setMinutes(data.minutes)
+          // Se o timer não estiver rodando, atualiza a interface visual imediatamente
+          if (stateRef.current.phase === 'idle' || !stateRef.current.running) {
+            const { focus } = parseTime(data.minutes)
+            setRemaining(focus)
+            setTotal(focus)
+          }
+        }
+        if (data.loops !== undefined) setLoops(Number(data.loops))
+      })
+    }
+  }, [themeAPI, parseTime])
+
+  // ENVIA as mudanças para o localStorage e para o processo Main (sincronizar outras janelas)
   useEffect(() => {
     localStorage.setItem('theme', theme)
     localStorage.setItem('minutes', minutes)
@@ -57,30 +87,20 @@ export function TimerProvider({ children }) {
 
     document.documentElement.setAttribute('data-theme', theme)
 
-    // Sincroniza com o processo Main para outras janelas
     themeAPI?.sendSettings({ theme, minutes, loops })
   }, [theme, minutes, loops, themeAPI])
 
-  // 3. Atualiza a referência de estado para o setInterval
+  // Mantém a referência de estado sincronizada para o setInterval
   useEffect(() => {
     stateRef.current = { phase, currentLoop, loops, minutes, remaining, running }
   }, [phase, currentLoop, loops, minutes, remaining, running])
 
-  // 4. Listeners de Hardware (Bateria)
   useEffect(() => {
-    api?.onMudancaEnergia((_event, onBattery) => setBatteryAlert(onBattery))
+    if (!api?.onMudancaEnergia) return
+    api.onMudancaEnergia((_event, onBattery) => setBatteryAlert(onBattery))
   }, [api])
 
-  // 5. Reset do tempo quando a configuração muda em modo idle
-  useEffect(() => {
-    if (phase === 'idle') {
-      const { focus } = parseTime(minutes)
-      setRemaining(focus)
-      setTotal(focus)
-    }
-  }, [minutes, phase, parseTime])
-
-  // --- Lógica do Timer ---
+  // --- Lógica de Execução do Timer ---
 
   const clearTimer = useCallback(() => {
     if (intervalRef.current) {
@@ -90,14 +110,13 @@ export function TimerProvider({ children }) {
   }, [])
 
   const goToNextPhase = useCallback(() => {
-    const { phase: currPhase, currentLoop: currLoopIdx, loops: totalLoops, minutes: minVal } = stateRef.current
-    const { focus, brk } = parseTime(minVal)
+    const { phase: p, currentLoop: cl, loops: l, minutes: m } = stateRef.current
+    const { focus, brk } = parseTime(m)
 
-    if (currPhase === 'focus') {
-      const nextLoop = currLoopIdx + 1
-
-      if (nextLoop >= totalLoops) {
-        // Fim da Sessão Completa
+    if (p === 'focus') {
+      addHistoryEntry() // Salva no histórico ao terminar um foco
+      const nextLoop = cl + 1
+      if (nextLoop >= l) {
         clearTimer()
         setRunning(false)
         setPhase('done')
@@ -107,7 +126,6 @@ export function TimerProvider({ children }) {
         playSound()
         api?.pararSessao()
       } else {
-        // Transição para Pausa
         setCurrentLoop(nextLoop)
         setPhase('break')
         setRemaining(brk)
@@ -117,7 +135,6 @@ export function TimerProvider({ children }) {
         playSound()
       }
     } else {
-      // Transição Pausa -> Foco
       setPhase('focus')
       setRemaining(focus)
       setTotal(focus)
@@ -125,7 +142,7 @@ export function TimerProvider({ children }) {
       notify?.send('Pomodoro', 'Pausa concluída! De volta ao foco.')
       playSound()
     }
-  }, [clearTimer, api, notify, playSound, parseTime])
+  }, [clearTimer, api, notify, playSound, parseTime, addHistoryEntry])
 
   const startInterval = useCallback(() => {
     clearTimer()
@@ -140,13 +157,12 @@ export function TimerProvider({ children }) {
     }, 1000)
   }, [clearTimer, goToNextPhase])
 
-  // --- Ações Públicas ---
+  // --- Funções de Controle ---
 
   const startSession = useCallback(async () => {
     if (running) return
-
     const ok = await api?.iniciarSessao()
-    if (api && !ok) return // Bloqueia se o sistema não permitir (ex: erro no main)
+    if (api && !ok) return
 
     const { focus } = parseTime(minutes)
     setPhase('focus')
@@ -165,8 +181,8 @@ export function TimerProvider({ children }) {
     await api?.pararSessao()
     clearTimer()
     setRunning(false)
-    setMessage('Sessão de foco pausada')
-    notify?.send('Pomodoro', 'A sessão foi pausada')
+    setMessage('Sessão de foco parada')
+    notify?.send('Pomodoro', 'A sessão de foco foi parada')
     playSound()
   }, [running, api, clearTimer, notify, playSound])
 
@@ -192,12 +208,13 @@ export function TimerProvider({ children }) {
   return (
     <TimerContext.Provider
       value={{
-        // Configurações
-        theme, setTheme,
-        minutes, setMinutes,
-        loops, setLoops,
-
-        // Estado do Timer
+        theme,
+        setTheme,
+        minutes,
+        setMinutes,
+        loops,
+        setLoops,
+        history, // Exportado para o History.jsx
         phase,
         running,
         currentLoop,
@@ -205,8 +222,6 @@ export function TimerProvider({ children }) {
         total,
         message,
         batteryAlert,
-
-        // Ações
         startSession,
         stopSession,
         cancelSession,
@@ -220,8 +235,6 @@ export function TimerProvider({ children }) {
 
 export function useTimer() {
   const context = useContext(TimerContext)
-  if (!context) {
-    throw new Error('useTimer deve ser usado dentro de um TimerProvider')
-  }
+  if (!context) throw new Error('useTimer deve ser usado dentro de um TimerProvider')
   return context
 }

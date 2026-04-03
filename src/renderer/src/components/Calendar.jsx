@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
-import './Calendar.css'
+import '../assets/css//Calendar.css'
 
 const MONTHS = [
   'Janeiro',

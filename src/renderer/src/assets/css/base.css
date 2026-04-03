@@ -71,6 +71,21 @@ h4 {
   --transition-base: 0.25s ease;
   --transition-slow: 0.4s ease;
   --transition-theme: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+
+  --glass-blur: saturate(180%) blur(26px);
+  --glass-blur-heavy: saturate(200%) blur(40px);
+  --glass-blur-light: saturate(160%) blur(14px);
+  --glass-radius: 18px;
+  --glass-radius-sm: 12px;
+  --glass-radius-xs: 8px;
+  --glass-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.12), 0 24px 64px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 var(--glass-border-inner, rgba(255, 255, 255, 0.3)),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+  --glass-shadow-sm:
+    0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 var(--glass-border-inner, rgba(255, 255, 255, 0.3)),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
 }
 
 .pomodoro,
@@ -88,11 +103,21 @@ h4 {
   --color-dot-done: #e94560;
   --color-dot-active: rgba(233, 69, 96, 0.45);
   --color-dot-idle: rgba(255, 255, 255, 0.15);
-
   --phase-focus: #e94560;
   --phase-break: #4ecdc4;
   --phase-idle: rgba(255, 255, 255, 0.2);
   --phase-done: #f7b731;
+
+  --glass-bg: rgba(255, 255, 255, 0.07);
+  --glass-bg-mid: rgba(255, 255, 255, 0.11);
+  --glass-bg-surface: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(233, 69, 96, 0.22);
+  --glass-border-inner: rgba(255, 255, 255, 0.3);
+  --glass-border-subtle: rgba(233, 69, 96, 0.1);
+  --glass-shine-top: rgba(255, 255, 255, 0.24);
+  --bg-orb-1: rgba(233, 69, 96, 0.18);
+  --bg-orb-2: rgba(78, 205, 196, 0.1);
+  --bg-orb-3: rgba(160, 30, 60, 0.08);
 }
 
 .dark,
@@ -110,11 +135,21 @@ h4 {
   --color-dot-done: #ffffff;
   --color-dot-active: rgba(255, 255, 255, 0.4);
   --color-dot-idle: rgba(255, 255, 255, 0.12);
-
   --phase-focus: #ffffff;
   --phase-break: #aaaaaa;
   --phase-idle: rgba(255, 255, 255, 0.15);
   --phase-done: #f7b731;
+
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg-mid: rgba(255, 255, 255, 0.08);
+  --glass-bg-surface: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-border-inner: rgba(255, 255, 255, 0.24);
+  --glass-border-subtle: rgba(255, 255, 255, 0.06);
+  --glass-shine-top: rgba(255, 255, 255, 0.18);
+  --bg-orb-1: rgba(80, 80, 80, 0.14);
+  --bg-orb-2: rgba(50, 50, 50, 0.1);
+  --bg-orb-3: rgba(30, 30, 30, 0.08);
 }
 
 .ocean,
@@ -132,11 +167,21 @@ h4 {
   --color-dot-done: #00d4ff;
   --color-dot-active: rgba(0, 212, 255, 0.4);
   --color-dot-idle: rgba(255, 255, 255, 0.12);
-
   --phase-focus: #00d4ff;
   --phase-break: #0099bb;
   --phase-idle: rgba(0, 212, 255, 0.15);
   --phase-done: #f7b731;
+
+  --glass-bg: rgba(0, 180, 220, 0.07);
+  --glass-bg-mid: rgba(0, 180, 220, 0.11);
+  --glass-bg-surface: rgba(0, 180, 220, 0.05);
+  --glass-border: rgba(0, 212, 255, 0.22);
+  --glass-border-inner: rgba(160, 240, 255, 0.32);
+  --glass-border-subtle: rgba(0, 212, 255, 0.1);
+  --glass-shine-top: rgba(160, 240, 255, 0.28);
+  --bg-orb-1: rgba(0, 120, 220, 0.22);
+  --bg-orb-2: rgba(0, 200, 220, 0.14);
+  --bg-orb-3: rgba(0, 80, 180, 0.1);
 }
 
 .forest,
@@ -154,11 +199,21 @@ h4 {
   --color-dot-done: #4caf50;
   --color-dot-active: rgba(76, 175, 80, 0.4);
   --color-dot-idle: rgba(255, 255, 255, 0.12);
-
   --phase-focus: #4caf50;
   --phase-break: #81c784;
   --phase-idle: rgba(76, 175, 80, 0.15);
   --phase-done: #f7b731;
+
+  --glass-bg: rgba(76, 175, 80, 0.06);
+  --glass-bg-mid: rgba(76, 175, 80, 0.1);
+  --glass-bg-surface: rgba(76, 175, 80, 0.04);
+  --glass-border: rgba(76, 175, 80, 0.22);
+  --glass-border-inner: rgba(160, 230, 160, 0.32);
+  --glass-border-subtle: rgba(76, 175, 80, 0.1);
+  --glass-shine-top: rgba(180, 255, 180, 0.22);
+  --bg-orb-1: rgba(30, 120, 60, 0.22);
+  --bg-orb-2: rgba(80, 180, 80, 0.12);
+  --bg-orb-3: rgba(20, 80, 40, 0.1);
 }
 
 .sunset,
@@ -176,11 +231,21 @@ h4 {
   --color-dot-done: #ff6b35;
   --color-dot-active: rgba(255, 107, 53, 0.4);
   --color-dot-idle: rgba(255, 255, 255, 0.12);
-
   --phase-focus: #ff6b35;
   --phase-break: #ffab76;
   --phase-idle: rgba(255, 107, 53, 0.15);
   --phase-done: #f7b731;
+
+  --glass-bg: rgba(255, 107, 53, 0.06);
+  --glass-bg-mid: rgba(255, 107, 53, 0.1);
+  --glass-bg-surface: rgba(255, 107, 53, 0.04);
+  --glass-border: rgba(255, 107, 53, 0.24);
+  --glass-border-inner: rgba(255, 200, 150, 0.32);
+  --glass-border-subtle: rgba(255, 107, 53, 0.11);
+  --glass-shine-top: rgba(255, 220, 180, 0.26);
+  --bg-orb-1: rgba(255, 100, 40, 0.2);
+  --bg-orb-2: rgba(220, 60, 20, 0.12);
+  --bg-orb-3: rgba(200, 80, 0, 0.08);
 }
 
 .light,
@@ -198,11 +263,21 @@ h4 {
   --color-dot-done: #c0392b;
   --color-dot-active: rgba(192, 57, 43, 0.35);
   --color-dot-idle: rgba(0, 0, 0, 0.15);
-
   --phase-focus: #c0392b;
   --phase-break: #27ae60;
   --phase-idle: rgba(0, 0, 0, 0.15);
   --phase-done: #e67e22;
+
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-mid: rgba(255, 255, 255, 0.72);
+  --glass-bg-surface: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-border-inner: rgba(255, 255, 255, 0.9);
+  --glass-border-subtle: rgba(0, 0, 0, 0.06);
+  --glass-shine-top: rgba(255, 255, 255, 0.8);
+  --bg-orb-1: rgba(192, 57, 43, 0.1);
+  --bg-orb-2: rgba(39, 174, 96, 0.08);
+  --bg-orb-3: rgba(150, 100, 80, 0.06);
 }
 
 .neon,
@@ -220,11 +295,21 @@ h4 {
   --color-dot-done: #39ff14;
   --color-dot-active: rgba(57, 255, 20, 0.35);
   --color-dot-idle: rgba(57, 255, 20, 0.1);
-
   --phase-focus: #39ff14;
   --phase-break: #00ffcc;
   --phase-idle: rgba(57, 255, 20, 0.12);
   --phase-done: #ffe600;
+
+  --glass-bg: rgba(57, 255, 20, 0.04);
+  --glass-bg-mid: rgba(57, 255, 20, 0.07);
+  --glass-bg-surface: rgba(57, 255, 20, 0.02);
+  --glass-border: rgba(57, 255, 20, 0.22);
+  --glass-border-inner: rgba(57, 255, 20, 0.36);
+  --glass-border-subtle: rgba(57, 255, 20, 0.1);
+  --glass-shine-top: rgba(120, 255, 100, 0.26);
+  --bg-orb-1: rgba(57, 255, 20, 0.12);
+  --bg-orb-2: rgba(0, 255, 200, 0.08);
+  --bg-orb-3: rgba(0, 180, 60, 0.06);
 }
 
 .lavender,
@@ -242,11 +327,21 @@ h4 {
   --color-dot-done: #b388ff;
   --color-dot-active: rgba(179, 136, 255, 0.4);
   --color-dot-idle: rgba(255, 255, 255, 0.12);
-
   --phase-focus: #b388ff;
   --phase-break: #80cbc4;
   --phase-idle: rgba(179, 136, 255, 0.15);
   --phase-done: #f7b731;
+
+  --glass-bg: rgba(179, 136, 255, 0.07);
+  --glass-bg-mid: rgba(179, 136, 255, 0.11);
+  --glass-bg-surface: rgba(179, 136, 255, 0.04);
+  --glass-border: rgba(179, 136, 255, 0.22);
+  --glass-border-inner: rgba(220, 200, 255, 0.34);
+  --glass-border-subtle: rgba(179, 136, 255, 0.1);
+  --glass-shine-top: rgba(230, 210, 255, 0.26);
+  --bg-orb-1: rgba(140, 100, 255, 0.2);
+  --bg-orb-2: rgba(180, 130, 255, 0.12);
+  --bg-orb-3: rgba(100, 60, 200, 0.1);
 }
 
 .midnight,
@@ -264,11 +359,21 @@ h4 {
   --color-dot-done: #ffd60a;
   --color-dot-active: rgba(255, 214, 10, 0.35);
   --color-dot-idle: rgba(255, 255, 255, 0.12);
-
   --phase-focus: #ffd60a;
   --phase-break: #00b4d8;
   --phase-idle: rgba(255, 214, 10, 0.12);
   --phase-done: #f7b731;
+
+  --glass-bg: rgba(255, 214, 10, 0.05);
+  --glass-bg-mid: rgba(255, 214, 10, 0.08);
+  --glass-bg-surface: rgba(255, 214, 10, 0.03);
+  --glass-border: rgba(255, 214, 10, 0.2);
+  --glass-border-inner: rgba(255, 240, 120, 0.32);
+  --glass-border-subtle: rgba(255, 214, 10, 0.09);
+  --glass-shine-top: rgba(255, 240, 150, 0.26);
+  --bg-orb-1: rgba(255, 214, 10, 0.14);
+  --bg-orb-2: rgba(0, 180, 216, 0.1);
+  --bg-orb-3: rgba(0, 53, 102, 0.12);
 }
 
 .coffee,
@@ -286,11 +391,21 @@ h4 {
   --color-dot-done: #c8a96e;
   --color-dot-active: rgba(200, 169, 110, 0.4);
   --color-dot-idle: rgba(255, 255, 255, 0.12);
-
   --phase-focus: #c8a96e;
   --phase-break: #a07850;
   --phase-idle: rgba(200, 169, 110, 0.15);
   --phase-done: #f7b731;
+
+  --glass-bg: rgba(200, 169, 110, 0.07);
+  --glass-bg-mid: rgba(200, 169, 110, 0.11);
+  --glass-bg-surface: rgba(200, 169, 110, 0.05);
+  --glass-border: rgba(200, 169, 110, 0.22);
+  --glass-border-inner: rgba(240, 210, 160, 0.32);
+  --glass-border-subtle: rgba(200, 169, 110, 0.1);
+  --glass-shine-top: rgba(255, 230, 180, 0.26);
+  --bg-orb-1: rgba(160, 90, 30, 0.2);
+  --bg-orb-2: rgba(200, 140, 60, 0.12);
+  --bg-orb-3: rgba(120, 60, 10, 0.1);
 }
 
 .cyber,
@@ -308,11 +423,21 @@ h4 {
   --color-dot-done: #ff00ff;
   --color-dot-active: rgba(255, 0, 255, 0.35);
   --color-dot-idle: rgba(255, 0, 255, 0.1);
-
   --phase-focus: #ff00ff;
   --phase-break: #00ffff;
   --phase-idle: rgba(255, 0, 255, 0.12);
   --phase-done: #ffe600;
+
+  --glass-bg: rgba(255, 0, 255, 0.05);
+  --glass-bg-mid: rgba(255, 0, 255, 0.08);
+  --glass-bg-surface: rgba(255, 0, 255, 0.03);
+  --glass-border: rgba(255, 0, 255, 0.22);
+  --glass-border-inner: rgba(255, 150, 255, 0.34);
+  --glass-border-subtle: rgba(255, 0, 255, 0.1);
+  --glass-shine-top: rgba(255, 180, 255, 0.26);
+  --bg-orb-1: rgba(200, 0, 200, 0.18);
+  --bg-orb-2: rgba(100, 0, 255, 0.12);
+  --bg-orb-3: rgba(255, 0, 180, 0.08);
 }
 
 .ice,
@@ -330,11 +455,21 @@ h4 {
   --color-dot-done: #0288d1;
   --color-dot-active: rgba(2, 136, 209, 0.35);
   --color-dot-idle: rgba(0, 0, 0, 0.12);
-
   --phase-focus: #0288d1;
   --phase-break: #4fc3f7;
   --phase-idle: rgba(2, 136, 209, 0.15);
   --phase-done: #e67e22;
+
+  --glass-bg: rgba(255, 255, 255, 0.52);
+  --glass-bg-mid: rgba(255, 255, 255, 0.7);
+  --glass-bg-surface: rgba(255, 255, 255, 0.38);
+  --glass-border: rgba(2, 136, 209, 0.16);
+  --glass-border-inner: rgba(255, 255, 255, 0.88);
+  --glass-border-subtle: rgba(2, 136, 209, 0.08);
+  --glass-shine-top: rgba(255, 255, 255, 0.8);
+  --bg-orb-1: rgba(120, 180, 255, 0.16);
+  --bg-orb-2: rgba(180, 220, 255, 0.12);
+  --bg-orb-3: rgba(2, 136, 209, 0.1);
 }
 
 .solar,
@@ -352,11 +487,182 @@ h4 {
   --color-dot-done: #ffab00;
   --color-dot-active: rgba(255, 171, 0, 0.35);
   --color-dot-idle: rgba(255, 255, 255, 0.12);
-
   --phase-focus: #ffab00;
   --phase-break: #ff6f00;
   --phase-idle: rgba(255, 171, 0, 0.15);
   --phase-done: #f7b731;
+
+  --glass-bg: rgba(255, 171, 0, 0.06);
+  --glass-bg-mid: rgba(255, 171, 0, 0.1);
+  --glass-bg-surface: rgba(255, 171, 0, 0.04);
+  --glass-border: rgba(255, 171, 0, 0.24);
+  --glass-border-inner: rgba(255, 230, 120, 0.34);
+  --glass-border-subtle: rgba(255, 171, 0, 0.11);
+  --glass-shine-top: rgba(255, 240, 160, 0.28);
+  --bg-orb-1: rgba(255, 200, 0, 0.18);
+  --bg-orb-2: rgba(255, 140, 20, 0.12);
+  --bg-orb-3: rgba(220, 100, 0, 0.1);
+}
+
+.app.pomodoro {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, var(--bg-orb-1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 88% 28%, var(--bg-orb-2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 92%, var(--bg-orb-3) 0%, transparent 60%), #1a1a2e;
+}
+
+.app.dark {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, var(--bg-orb-1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 88% 28%, var(--bg-orb-2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 92%, var(--bg-orb-3) 0%, transparent 60%), #0d0d0d;
+}
+
+.app.ocean {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, var(--bg-orb-1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 88% 28%, var(--bg-orb-2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 92%, var(--bg-orb-3) 0%, transparent 60%), #0a1628;
+}
+
+.app.forest {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, var(--bg-orb-1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 88% 28%, var(--bg-orb-2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 92%, var(--bg-orb-3) 0%, transparent 60%), #0d1f0d;
+}
+
+.app.sunset {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, var(--bg-orb-1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 88% 28%, var(--bg-orb-2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 92%, var(--bg-orb-3) 0%, transparent 60%), #1a0a00;
+}
+
+.app.light {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, var(--bg-orb-1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 88% 28%, var(--bg-orb-2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 92%, var(--bg-orb-3) 0%, transparent 60%), #f5f5f0;
+}
+
+.app.neon {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, var(--bg-orb-1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 88% 28%, var(--bg-orb-2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 92%, var(--bg-orb-3) 0%, transparent 60%), #000000;
+}
+
+.app.lavender {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, var(--bg-orb-1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 88% 28%, var(--bg-orb-2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 92%, var(--bg-orb-3) 0%, transparent 60%), #1a1530;
+}
+
+.app.midnight {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, var(--bg-orb-1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 88% 28%, var(--bg-orb-2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 92%, var(--bg-orb-3) 0%, transparent 60%), #000814;
+}
+
+.app.coffee {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, var(--bg-orb-1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 88% 28%, var(--bg-orb-2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 92%, var(--bg-orb-3) 0%, transparent 60%), #1c1007;
+}
+
+.app.cyber {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, var(--bg-orb-1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 88% 28%, var(--bg-orb-2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 92%, var(--bg-orb-3) 0%, transparent 60%), #0a0010;
+}
+
+.app.ice {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, var(--bg-orb-1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 88% 28%, var(--bg-orb-2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 92%, var(--bg-orb-3) 0%, transparent 60%), #e8f4f8;
+}
+
+.app.solar {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, var(--bg-orb-1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 88% 28%, var(--bg-orb-2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 92%, var(--bg-orb-3) 0%, transparent 60%), #0d0900;
+}
+
+.app.light .window-title,
+.app.light .select-row label,
+.app.light .mensagem {
+  color: rgba(10, 10, 30, 0.4);
+}
+
+.app.light .timer-time {
+  color: rgba(10, 10, 30, 0.88);
+  text-shadow: none;
+}
+
+.app.light .dot {
+  background: rgba(0, 0, 0, 0.13);
+  border-color: rgba(0, 0, 0, 0.09);
+}
+
+.app.light .ring-bg {
+  stroke: rgba(0, 0, 0, 0.1);
+}
+
+.app.light .btn-stop,
+.app.light .btn-cancel {
+  color: rgba(10, 10, 30, 0.45);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.app.light .btn-stop:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(10, 10, 30, 0.75);
+}
+
+.app.light .select-row select {
+  color: rgba(10, 10, 30, 0.85);
+}
+
+.app.ice .window-title,
+.app.ice .select-row label,
+.app.ice .mensagem {
+  color: rgba(10, 30, 80, 0.42);
+}
+
+.app.ice .timer-time {
+  color: rgba(10, 30, 80, 0.88);
+  text-shadow: none;
+}
+
+.app.ice .dot {
+  background: rgba(2, 136, 209, 0.18);
+  border-color: rgba(2, 136, 209, 0.12);
+}
+
+.app.ice .ring-bg {
+  stroke: rgba(2, 136, 209, 0.14);
+}
+
+.app.ice .btn-stop,
+.app.ice .btn-cancel {
+  color: rgba(10, 30, 80, 0.45);
+  border-color: rgba(2, 136, 209, 0.16);
+}
+
+.app.ice .btn-stop:hover:not(:disabled) {
+  background: rgba(2, 136, 209, 0.06);
+  color: rgba(10, 30, 80, 0.75);
+}
+
+.app.ice .select-row select {
+  color: rgba(10, 30, 80, 0.85);
 }
 
 @keyframes pulse {
@@ -364,6 +670,7 @@ h4 {
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.35;
   }
@@ -374,6 +681,7 @@ h4 {
     opacity: 0;
     transform: translateY(6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -385,6 +693,7 @@ h4 {
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

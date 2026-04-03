@@ -2,12 +2,14 @@ import { useTimer } from '../context/TimerContext'
 import Minutes from './Selects/Minutes'
 import Times from './Selects/Times'
 import Themes from './Selects/Themes'
+import WindowControls from './WindowControls'
 
 function Config() {
   const { theme, setTheme, minutes, setMinutes, loops, setLoops, running } = useTimer()
 
   return (
     <div className="settings-config">
+      <WindowControls />
       <div className="settings-config__inner">
         <span className="settings-config__section-label">Timer</span>
 

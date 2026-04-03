@@ -11,14 +11,14 @@ import {
   shell
 } from 'electron'
 
-import { join } from 'path'
-import { spawn } from 'child_process'
+import { join } from 'node:path'
+import { spawn } from 'node:child_process'
 import icon from '../../resources/icon.png?asset'
 import dotenv from 'dotenv'
 dotenv.config()
+export let mainWindow = null
+export let secondaryWindow = null
 
-let mainWindow
-let secondaryWindow
 let bloqueadorFocoId = null
 let tray = null
 
@@ -26,9 +26,12 @@ function createSettingsWindow() {
   secondaryWindow = new BrowserWindow({
     parent: mainWindow,
     show: false,
-    width: 600,
-    height: 600,
-    frame: true,
+    width: 450,
+    height: 550,
+    minWidth: 350,
+    minHeight: 450,
+    maxWidth: 600,
+    frame: false,
     transparent: true,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -120,21 +123,21 @@ app.whenReady().then(() => {
   })
 })
 
-ipcMain.on('fechar-janela', () => {
-  if (mainWindow) mainWindow.close()
+ipcMain.on('fechar-janela', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (win) win.close()
 })
 
-ipcMain.on('minimizar-janela', () => {
-  if (mainWindow) mainWindow.minimize()
+ipcMain.on('minimizar-janela', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (win) win.minimize()
 })
 
-ipcMain.on('maximizar-janela', () => {
-  if (mainWindow) {
-    if (mainWindow.isMaximized()) {
-      mainWindow.unmaximize()
-    } else {
-      mainWindow.maximize()
-    }
+ipcMain.on('maximizar-janela', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (win) {
+    if (win.isMaximized()) win.unmaximize()
+    else win.maximize()
   }
 })
 

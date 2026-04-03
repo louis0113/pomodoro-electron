@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './History.css'
+import '../assets/css//History.css'
 import PropTypes from 'prop-types'
 import { useTimer } from '../context/TimerContext'
 
