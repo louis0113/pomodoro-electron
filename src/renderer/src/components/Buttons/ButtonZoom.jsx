@@ -1,5 +1,5 @@
-import Button from '../Template/Button';
-const api = window.menuAPI;
+import Button from '../Template/Button'
+const api = window.menuAPI
 
 export default function ButtonZoom() {
   return (
@@ -12,5 +12,5 @@ export default function ButtonZoom() {
         { label: 'Tamanho original', onClick: () => api.send('zoom-reset') }
       ]}
     />
-  );
+  )
 }

@@ -18,11 +18,17 @@ const apiMenu = {
   send: (comando) => ipcRenderer.send('menu-comando', comando)
 }
 
+const apiTheme = {
+  sendSettings: (settings) => ipcRenderer.send('update-settings', settings),
+  onSettings: (callback) => ipcRenderer.on('settings-changed', (_, data) => callback(data))
+}
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('widgetAPI', apiPomodoro)
     contextBridge.exposeInMainWorld('notifyAPI', apiNotify)
     contextBridge.exposeInMainWorld('menuAPI', apiMenu)
+    contextBridge.exposeInMainWorld('themeAPI', apiTheme)
   } catch (error) {
     console.error(error)
   }
@@ -30,4 +36,5 @@ if (process.contextIsolated) {
   window.widgetAPI = apiPomodoro
   window.notifyAPI = apiNotify
   window.menuAPI = apiMenu
+  window.themeAPI = apiTheme
 }

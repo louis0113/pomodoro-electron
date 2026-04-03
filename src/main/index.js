@@ -167,11 +167,17 @@ ipcMain.on('menu-comando', (event, comando) => {
       app.quit()
       break
     case 'help':
-      shell.openExternal('https://electronjs.org')
+      shell.openExternal('https://github.com/louis0113/pomodoro-electron')
       break
     case 'secondary':
       createSettingsWindow()
   }
+})
+
+ipcMain.on('update-settings', (event, settings) => {
+  BrowserWindow.getAllWindows().forEach((win) => {
+    win.webContents.send('settings-changed', settings)
+  })
 })
 
 ipcMain.handle('iniciar-foco', () => {

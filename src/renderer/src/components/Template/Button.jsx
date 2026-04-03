@@ -1,28 +1,26 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react'
 
 function Button({ className, value, func, disabled = false, menuOptions = [] }) {
-  const [open, setOpen] = useState(false);
-  const wrapperRef = useRef(null);
+  const [open, setOpen] = useState(false)
+  const wrapperRef = useRef(null)
 
   const handleClick = () => {
     if (menuOptions.length > 0) {
-      setOpen(!open);
+      setOpen(!open)
     } else if (func) {
-      func();
+      func()
     }
-  };
+  }
 
   useEffect(() => {
     function handleOutsideClick(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setOpen(false);
+        setOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-    };
-  }, []);
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => document.removeEventListener('mousedown', handleOutsideClick)
+  }, [])
 
   return (
     <div className="button-wrapper" ref={wrapperRef}>
@@ -36,8 +34,8 @@ function Button({ className, value, func, disabled = false, menuOptions = [] }) 
               <button
                 className="button-menu-item"
                 onClick={() => {
-                  option.onClick();
-                  setOpen(false);
+                  option.onClick()
+                  setOpen(false)
                 }}
               >
                 {option.label}
@@ -47,8 +45,7 @@ function Button({ className, value, func, disabled = false, menuOptions = [] }) 
         </ul>
       )}
     </div>
-  );
+  )
 }
 
-export default Button;
-
+export default Button

@@ -1,6 +1,5 @@
-*,
-*::before,
-*::after {
+/* ── Reset & Base ────────────────────────────────── */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -22,80 +21,57 @@
   --track-h: 52px;
 }
 
-html,
 body {
   width: 100%;
-  height: 100%;
+  height: 100vh;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 14px;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── window drag region ──────────────────────────── */
-.settings-titlebar {
-  -webkit-app-region: drag;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  padding: 0 18px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-
-.settings-titlebar span {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  -webkit-app-region: no-drag;
-  user-select: none;
-}
-
-/* ── root layout ─────────────────────────────────── */
-.config {
+/* ── Layout Root (Config.jsx) ────────────────────── */
+.settings-config {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px;
   width: 100%;
-  height: calc(600px - 38px);
+  height: 100%;
+  padding: 32px;
   overflow-y: auto;
-  scrollbar-width: none;
+  scrollbar-width: none; /* Firefox */
 }
 
-.config::-webkit-scrollbar {
-  display: none;
+.settings-config::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
-.config-inner {
+.settings-config__inner {
   width: 100%;
   max-width: 460px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
 }
 
-/* ── section label ───────────────────────────────── */
-.config-section-label {
+/* ── Typography & Labels ─────────────────────────── */
+.settings-config__section-label {
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-faint);
-  margin-bottom: 14px;
-  margin-top: 28px;
+  margin: 28px 0 14px 0;
+  display: block;
 }
 
-.config-section-label:first-child {
+.settings-config__section-label:first-child {
   margin-top: 0;
 }
 
-/* ── select-row ──────────────────────────────────── */
+/* ── Select Row (Select.jsx) ─────────────────────── */
 .select-row {
   display: flex;
   align-items: center;
@@ -106,11 +82,8 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 8px;
-  transition:
-    border-color 120ms ease,
-    background 120ms ease;
-  cursor: pointer;
   position: relative;
+  transition: border-color 120ms ease, background 120ms ease;
 }
 
 .select-row:hover {
@@ -120,55 +93,19 @@ body {
 
 .select-row:focus-within {
   border-color: var(--accent-dim);
-  outline: none;
 }
 
-.select-row:last-child {
-  margin-bottom: 0;
-}
-
-/* label side */
-.select-row__label {
+/* Esquerda: Label do Select */
+.select-row label {
   font-size: 14px;
   font-weight: 400;
   color: var(--text);
-  letter-spacing: 0.01em;
   user-select: none;
+  z-index: 2;
   pointer-events: none;
 }
 
-.select-row__hint {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-dim);
-  margin-top: 1px;
-  pointer-events: none;
-}
-
-.select-row__left {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-/* value / select side */
-.select-row__right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.select-row__value {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--accent);
-  letter-spacing: 0.02em;
-  pointer-events: none;
-}
-
-/* ── native select (hidden, covers the row) ─────── */
+/* Direita: O Select Nativo Invisível */
 .select-row select {
   position: absolute;
   inset: 0;
@@ -176,29 +113,24 @@ body {
   height: 100%;
   opacity: 0;
   cursor: pointer;
-  font-size: 14px;
-  border: none;
-  background: none;
+  z-index: 3;
   -webkit-appearance: none;
-  appearance: none;
-  z-index: 1;
 }
 
-/* chevron icon */
-.select-row__chevron {
-  width: 16px;
-  height: 16px;
+/* Estilização do valor visível (Simulação via CSS) */
+.select-row::after {
+  content: '▼';
+  font-size: 10px;
   color: var(--text-dim);
-  pointer-events: none;
-  flex-shrink: 0;
   transition: transform 120ms ease;
 }
 
-.select-row:focus-within .select-row__chevron {
-  color: var(--accent-dim);
+.select-row:focus-within::after {
+  color: var(--accent);
+  transform: rotate(180deg);
 }
 
-/* ── accent line on active row ───────────────────── */
+/* Linha de Accent Lateral */
 .select-row::before {
   content: '';
   position: absolute;
@@ -210,40 +142,50 @@ body {
   background: var(--accent);
   border-radius: 0 3px 3px 0;
   transition: transform 120ms ease;
+  z-index: 2;
 }
 
 .select-row:focus-within::before {
   transform: translateY(-50%) scaleY(1);
 }
 
-/* ── divider ─────────────────────────────────────── */
-.config-divider {
+/* Estado Desabilitado (Running) */
+.select-row select:disabled {
+  cursor: not-allowed;
+}
+
+.select-row select:disabled ~ label {
+  color: var(--text-faint);
+}
+
+/* ── Divider & Footer ────────────────────────────── */
+.settings-config__divider {
   height: 1px;
   background: var(--border);
   margin: 24px 0;
 }
 
-/* ── footer strip ────────────────────────────────── */
-.config-footer {
+.settings-config__footer {
   margin-top: auto;
-  padding-top: 24px;
+  padding-top: 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.config-footer__status {
+.settings-config__footer-status {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-faint);
   letter-spacing: 0.06em;
+  text-transform: lowercase;
 }
 
-.config-footer__status.active {
+.settings-config__footer-status.active {
   color: var(--accent-dim);
 }
 
-/* ── scrollbar ───────────────────────────────────── */
+/* ── Light Mode Support ──────────────────────────── */
 @media (prefers-color-scheme: light) {
   :root {
     --bg: #f4f4f2;
