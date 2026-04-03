@@ -1,25 +1,20 @@
 {
   "appId": "com.pomodoro.app",
   "productName": "Pomodoro-Electron",
-
   "asar": true,
   "compression": "store",
-
   "artifactName": "${productName}-${version}-${arch}.${ext}",
-
   "publish": [
     {
       "provider": "github",
       "releaseType": "release"
     }
   ],
-
   "directories": {
     "output": "dist",
     "buildResources": "build",
     "app": "."
   },
-
   "extraResources": [
     {
       "from": "assets/",
@@ -27,56 +22,49 @@
       "filter": ["**/*"]
     }
   ],
-
   "mac": {
     "icon": "build/icon.icns",
     "category": "public.app-category.productivity",
     "target": [
-      { "target": "dmg", "arch": ["x64"] },
-      { "target": "dmg", "arch": ["universal"] },
-      { "target": "dmg", "arch": ["arm64"] }
+      { "target": "dmg", "arch": ["universal"] }
     ]
   },
-
   "dmg": {
     "contents": [
       { "x": 130, "y": 220 },
       { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
     ]
   },
-
   "win": {
     "icon": "build/icon.ico",
     "target": [
       {
         "target": "nsis",
-        "arch": ["x64", "ia32"]
+        "arch": ["x64", "arm64"]
       },
       {
         "target": "portable",
-        "arch": ["x64", "ia32"]
+        "arch": ["x64", "arm64"]
       }
     ]
   },
-
   "portable": {
     "artifactName": "${productName}-Portable-${version}-${arch}.${ext}",
     "requestExecutionLevel": "user"
   },
-
   "nsis": {
-    "oneClick": true,
+    "oneClick": false,
     "perMachine": false,
-    "allowToChangeInstallationDirectory": false
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": true
   },
-
   "linux": {
     "icon": "build/icon.png",
     "category": "Utility",
     "maintainer": "Luiz Henrique <lhrds0113@proton.me>",
     "target": [
-      { "target": "AppImage", "arch": ["x64"] },
-      { "target": "deb", "arch": ["x64"] }
+      { "target": "AppImage", "arch": ["x64", "arm64"] },
+      { "target": "deb", "arch": ["x64", "arm64"] }
     ]
   }
 }
