@@ -12,13 +12,7 @@ function Select({ options, label, name, value, func, disabled = false }) {
   return (
     <div className="select-row">
       <label htmlFor={name}>{label}</label>
-      <select
-        id={name}
-        name={name}
-        value={value}
-        onChange={func}
-        disabled={disabled}
-      >
+      <select id={name} name={name} value={value} onChange={func} disabled={disabled}>
         {listOptions}
       </select>
     </div>

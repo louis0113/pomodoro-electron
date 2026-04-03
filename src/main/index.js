@@ -15,14 +15,23 @@ import { join } from 'node:path'
 import { spawn } from 'node:child_process'
 import icon from '../../resources/icon.png?asset'
 import dotenv from 'dotenv'
+
 dotenv.config()
+
 export let mainWindow = null
 export let secondaryWindow = null
 
 let bloqueadorFocoId = null
 let tray = null
 
+Menu.setApplicationMenu(null)
+
 function createSettingsWindow() {
+  if (secondaryWindow) {
+    secondaryWindow.focus()
+    return
+  }
+
   secondaryWindow = new BrowserWindow({
     parent: mainWindow,
     show: false,
@@ -36,7 +45,8 @@ function createSettingsWindow() {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      spellcheck: false
     }
   })
 
@@ -45,12 +55,17 @@ function createSettingsWindow() {
   secondaryWindow.once('ready-to-show', () => {
     secondaryWindow.show()
   })
+
+  secondaryWindow.on('closed', () => {
+    secondaryWindow = null
+  })
 }
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 720,
+    show: false,
     minWidth: 800,
     minHeight: 600,
     frame: false,
@@ -60,14 +75,21 @@ function createMainWindow() {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      backgroundThrottling: false
     }
+  })
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show()
+    mainWindow.focus()
   })
 
   const menu = Menu.buildFromTemplate([
     { label: 'Resetar app', role: 'reload' },
-    { label: 'Forçar resear app', role: 'forceReload' },
+    { label: 'Forçar resetar app', role: 'forceReload' },
     { label: 'Debug', role: 'toggleDevTools' },
+    { type: 'separator' },
     { label: 'Aumentar zoom', role: 'zoomIn' },
     { label: 'Diminuir zoom', role: 'zoomOut' },
     { label: 'Tamanho original', role: 'resetZoom' },
@@ -79,6 +101,10 @@ function createMainWindow() {
   })
 
   mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+
+  mainWindow.on('closed', () => {
+    mainWindow = null
+  })
 }
 
 app.commandLine.appendSwitch('log-level', '3')
@@ -86,82 +112,78 @@ app.commandLine.appendSwitch('log-level', '3')
 app.whenReady().then(() => {
   createMainWindow()
 
-  tray = new Tray(nativeImage.createFromPath(icon))
+  const trayIcon = nativeImage.createFromPath(icon)
+  tray = new Tray(trayIcon)
+
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'Minimizar',
-      type: 'normal',
-      click: () => mainWindow.minimize()
+      click: () => mainWindow?.minimize()
     },
     {
-      label: 'Maximizar',
-      type: 'normal',
+      label: 'Maximizar/Restaurar',
       click: () => {
-        if (mainWindow) {
-          if (mainWindow.isMaximized()) {
-            mainWindow.unmaximize()
-          } else {
-            mainWindow.maximize()
-          }
-        }
+        if (!mainWindow) return
+        mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize()
       }
     },
-    { label: 'Fechar', type: 'normal', click: () => mainWindow.close() }
+    { type: 'separator' },
+    { label: 'Fechar', click: () => app.quit() }
   ])
+
   tray.setContextMenu(contextMenu)
 
   powerMonitor.on('on-battery', () => {
-    mainWindow.webContents.send('alerta-energia', 'bateria')
+    mainWindow?.webContents.send('alerta-energia', 'bateria')
   })
 
   powerMonitor.on('on-ac', () => {
-    mainWindow.webContents.send('alerta-energia', 'tomada')
+    mainWindow?.webContents.send('alerta-energia', 'tomada')
   })
 
-  app.on('activate', function () {
+  app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
   })
 })
 
 ipcMain.on('fechar-janela', (event) => {
-  const win = BrowserWindow.fromWebContents(event.sender)
-  if (win) win.close()
+  BrowserWindow.fromWebContents(event.sender)?.close()
 })
 
 ipcMain.on('minimizar-janela', (event) => {
-  const win = BrowserWindow.fromWebContents(event.sender)
-  if (win) win.minimize()
+  BrowserWindow.fromWebContents(event.sender)?.minimize()
 })
 
 ipcMain.on('maximizar-janela', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   if (win) {
-    if (win.isMaximized()) win.unmaximize()
-    else win.maximize()
+    win.isMaximized() ? win.unmaximize() : win.maximize()
   }
 })
 
 ipcMain.on('menu-comando', (event, comando) => {
   if (!mainWindow) return
 
+  const wc = mainWindow.webContents
+
   switch (comando) {
     case 'reload':
-      mainWindow.reload()
+      wc.reload()
       break
     case 'force-reload':
-      mainWindow.webContents.reloadIgnoringCache()
+      wc.reloadIgnoringCache()
       break
     case 'debug':
-      mainWindow.webContents.toggleDevTools()
+      wc.toggleDevTools()
       break
     case 'zoom-in':
-      mainWindow.webContents.setZoomLevel(mainWindow.webContents.getZoomLevel() + 1)
+      wc.setZoomLevel(wc.getZoomLevel() + 1)
       break
     case 'zoom-out':
-      mainWindow.webContents.setZoomLevel(mainWindow.webContents.getZoomLevel() - 1)
+      wc.setZoomLevel(wc.getZoomLevel() - 1)
       break
     case 'zoom-reset':
-      mainWindow.webContents.setZoomLevel(0)
+      wc.setZoomLevel(0)
       break
     case 'fullscreen':
       mainWindow.setFullScreen(!mainWindow.isFullScreen())
@@ -174,13 +196,16 @@ ipcMain.on('menu-comando', (event, comando) => {
       break
     case 'secondary':
       createSettingsWindow()
+      break
   }
 })
 
 ipcMain.on('update-settings', (event, settings) => {
-  BrowserWindow.getAllWindows().forEach((win) => {
-    win.webContents.send('settings-changed', settings)
-  })
+  for (const win of BrowserWindow.getAllWindows()) {
+    if (!win.isDestroyed()) {
+      win.webContents.send('settings-changed', settings)
+    }
+  }
 })
 
 ipcMain.handle('iniciar-foco', () => {
@@ -192,7 +217,7 @@ ipcMain.handle('iniciar-foco', () => {
 })
 
 ipcMain.handle('parar-foco', () => {
-  if (bloqueadorFocoId !== null && powerSaveBlocker.isStarted(bloqueadorFocoId)) {
+  if (bloqueadorFocoId !== null) {
     powerSaveBlocker.stop(bloqueadorFocoId)
     bloqueadorFocoId = null
     return true
@@ -201,24 +226,22 @@ ipcMain.handle('parar-foco', () => {
 })
 
 ipcMain.on('show-notification', (event, { title, body }) => {
-  new Notification({ title, body }).show()
+  new Notification({ title, body, icon: nativeImage.createFromPath(icon) }).show()
 })
 
-ipcMain.on('play-sound', (event, url) => {
-  if (process.platform === 'linux') {
-    const canberra = spawn('canberra-gtk-play', ['--id=message', '--description=Pomodoro'])
-    canberra.on('error', () => {
-      spawn('paplay', ['/usr/share/sounds/freedesktop/stereo/message.oga']).on('error', () => {
-        spawn('aplay', ['/usr/share/sounds/alsa/Noise.wav'])
-      })
-    })
+ipcMain.on('play-sound', () => {
+  if (process.platform !== 'linux') return
+
+  const tryPlay = (cmd, args, next) => {
+    const p = spawn(cmd, args)
+    p.on('error', () => next && next())
   }
 
-  const urlString = fetch(url)
-    .then((audio) => audio.toString())
-    .catch(() => console.log('Error'))
-
-  return urlString.href
+  tryPlay('canberra-gtk-play', ['--id=message'], () => {
+    tryPlay('paplay', ['/usr/share/sounds/freedesktop/stereo/message.oga'], () => {
+      tryPlay('aplay', ['/usr/share/sounds/alsa/Noise.wav'])
+    })
+  })
 })
 
 app.on('window-all-closed', () => {
