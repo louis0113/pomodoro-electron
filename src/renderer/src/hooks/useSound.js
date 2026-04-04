@@ -20,9 +20,18 @@ async function fetchPreviewUrl(soundId, token) {
   return data.previews['preview-hq-mp3'] || data.previews['preview-lq-mp3']
 }
 
+// Eventos que interrompem qualquer som em reprodução sem tocar outro
+const STOP_ONLY = new Set(['SESSION_STOP', 'SESSION_CANCEL'])
+
+function stopAudio(audio) {
+  if (!audio) return
+  audio.pause()
+  audio.currentTime = 0
+}
+
 export function useSound() {
-  // cache: event -> Audio object
   const cache = useRef({})
+  const current = useRef(null) // áudio em reprodução no momento
 
   useEffect(() => {
     async function preload() {
@@ -43,15 +52,27 @@ export function useSound() {
   }, [])
 
   const play = useCallback((event) => {
+    // Para qualquer som que esteja tocando
+    stopAudio(current.current)
+    current.current = null
+
+    // Ações de parar/cancelar apenas interrompem, não tocam nada
+    if (STOP_ONLY.has(event)) return
+
     const audio = cache.current[event]
     if (audio) {
       audio.currentTime = 0
       audio.play().catch((err) => console.error('playSound error:', err))
+      current.current = audio
+      audio.onended = () => { current.current = null }
       return
     }
 
     // Fallback: som padrão local
-    new Audio(notificationSound).play().catch((err) => console.error('playSound fallback error:', err))
+    const fallback = new Audio(notificationSound)
+    fallback.play().catch((err) => console.error('playSound fallback error:', err))
+    current.current = fallback
+    fallback.onended = () => { current.current = null }
   }, [])
 
   return play
