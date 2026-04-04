@@ -13,7 +13,10 @@ import {
   deleteTimestamp,
   getHistoryFromDb,
   getDbSettings,
-  setDbSettings
+  setDbSettings,
+  getCalendarNotes,
+  setCalendarNote,
+  deleteCalendarNote
 } from './crud.js'
 import { isDbAvailable } from './database.js'
 
@@ -85,5 +88,16 @@ export function registerDatabaseHandlers() {
   ipcMain.handle(
     'db:settings:set',
     wrap((data) => setDbSettings(data))
+  )
+
+  // CalendarNote
+  ipcMain.handle('db:calendar:get', wrap(getCalendarNotes))
+  ipcMain.handle(
+    'db:calendar:set',
+    wrap((date, note) => setCalendarNote(date, note))
+  )
+  ipcMain.handle(
+    'db:calendar:delete',
+    wrap((date) => deleteCalendarNote(date))
   )
 }

@@ -102,6 +102,12 @@ const apiDb = {
   settings: {
     get: () => ipcRenderer.invoke('db:settings:get'),
     set: (data) => ipcRenderer.invoke('db:settings:set', data)
+  },
+
+  calendar: {
+    get: () => ipcRenderer.invoke('db:calendar:get'),
+    set: (date, note) => ipcRenderer.invoke('db:calendar:set', date, note),
+    delete: (date) => ipcRenderer.invoke('db:calendar:delete', date)
   }
 }
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import '../assets/css//Calendar.css'
+import { useCalendarNotes } from '../hooks/useDatabase'
 
 const MONTHS = [
   'Janeiro',
@@ -36,10 +37,21 @@ function isToday(year, month, day) {
   return t.getFullYear() === year && t.getMonth() === month && t.getDate() === day
 }
 
+function lsGetView() {
+  try {
+    const raw = localStorage.getItem('cal-view')
+    if (!raw) return null
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
 export default function Calendar({ onClose }) {
   const today = new Date()
-  const [viewYear, setViewYear] = useState(today.getFullYear())
-  const [viewMonth, setViewMonth] = useState(today.getMonth())
+  const savedView = lsGetView()
+  const [viewYear, setViewYear] = useState(savedView?.year ?? today.getFullYear())
+  const [viewMonth, setViewMonth] = useState(savedView?.month ?? today.getMonth())
   const [notes, setNotes] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('cal-notes') || '{}')
@@ -52,10 +64,15 @@ export default function Calendar({ onClose }) {
   const [animDir, setAnimDir] = useState(null)
   const overlayRef = useRef(null)
   const textareaRef = useRef(null)
+  const { getNotes, setNote, deleteNote: removeNote } = useCalendarNotes()
 
   useEffect(() => {
-    localStorage.setItem('cal-notes', JSON.stringify(notes))
-  }, [notes])
+    getNotes().then(setNotes)
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('cal-view', JSON.stringify({ year: viewYear, month: viewMonth }))
+  }, [viewYear, viewMonth])
 
   useEffect(() => {
     if (selected && textareaRef.current) {
@@ -89,24 +106,17 @@ export default function Calendar({ onClose }) {
     setDraft(notes[key] || '')
   }
 
-  function saveNote() {
+  async function saveNote() {
     if (!selected) return
-    setNotes((n) => {
-      const updated = { ...n }
-      if (draft.trim()) updated[selected] = draft.trim()
-      else delete updated[selected]
-      return updated
-    })
+    const updated = await setNote(selected, draft)
+    setNotes(updated)
     setSelected(null)
   }
 
-  function deleteNote() {
+  async function deleteNote() {
     if (!selected) return
-    setNotes((n) => {
-      const u = { ...n }
-      delete u[selected]
-      return u
-    })
+    const updated = await removeNote(selected)
+    setNotes(updated)
     setSelected(null)
   }
 

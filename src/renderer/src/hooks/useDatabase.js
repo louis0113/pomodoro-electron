@@ -143,3 +143,62 @@ export function useDatabase() {
     listSessions
   }
 }
+
+// ─── localStorage helpers for CalendarNote ────────────────────────────────────
+
+const LS_CAL_KEY = 'cal-notes'
+
+function lsGetCalendarNotes() {
+  try {
+    return JSON.parse(localStorage.getItem(LS_CAL_KEY) || '{}')
+  } catch {
+    return {}
+  }
+}
+
+function lsSaveCalendarNotes(notes) {
+  localStorage.setItem(LS_CAL_KEY, JSON.stringify(notes))
+}
+
+export function useCalendarNotes() {
+  const getNotes = useCallback(async () => {
+    try {
+      const res = await window.dbAPI?.calendar.get()
+      if (res?.ok && res.data !== null) {
+        // Sincroniza localStorage com o DB para offline posterior
+        lsSaveCalendarNotes(res.data)
+        return res.data
+      }
+    } catch {
+      // IPC indisponível
+    }
+    return lsGetCalendarNotes()
+  }, [])
+
+  const setNote = useCallback(async (date, note) => {
+    // Atualiza localStorage imediatamente
+    const notes = lsGetCalendarNotes()
+    if (note && note.trim()) notes[date] = note.trim()
+    else delete notes[date]
+    lsSaveCalendarNotes(notes)
+
+    // Persiste no DB se disponível
+    try {
+      if (note && note.trim()) {
+        await window.dbAPI?.calendar.set(date, note)
+      } else {
+        await window.dbAPI?.calendar.delete(date)
+      }
+    } catch {
+      // silencioso
+    }
+
+    return lsGetCalendarNotes()
+  }, [])
+
+  const deleteNote = useCallback(async (date) => {
+    return setNote(date, '')
+  }, [setNote])
+
+  return { getNotes, setNote, deleteNote }
+}

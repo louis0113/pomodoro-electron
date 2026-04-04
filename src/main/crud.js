@@ -104,6 +104,34 @@ export async function getHistoryFromDb() {
   return history
 }
 
+// ─── CalendarNote ─────────────────────────────────────────────────────────────
+
+export async function getCalendarNotes() {
+  if (!isDbAvailable()) return null
+  const { CalendarNote } = getModels()
+  const rows = await CalendarNote.findAll({ order: [['date', 'ASC']] })
+  const notes = {}
+  for (const r of rows) notes[r.date] = r.note
+  return notes
+}
+
+export async function setCalendarNote(date, note) {
+  if (!isDbAvailable()) return null
+  const { CalendarNote } = getModels()
+  if (!note || !note.trim()) {
+    await CalendarNote.destroy({ where: { date } })
+    return null
+  }
+  const [row] = await CalendarNote.upsert({ date, note: note.trim() })
+  return row.toJSON()
+}
+
+export async function deleteCalendarNote(date) {
+  if (!isDbAvailable()) return null
+  const { CalendarNote } = getModels()
+  return await CalendarNote.destroy({ where: { date } })
+}
+
 // ─── Settings ─────────────────────────────────────────────────────────────────
 
 export async function getDbSettings() {

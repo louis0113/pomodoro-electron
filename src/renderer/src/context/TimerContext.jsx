@@ -9,6 +9,21 @@ const TimerStateContext = createContext(null)
 const TimerConfigContext = createContext(null)
 const TimerActionsContext = createContext(null)
 
+// Carrega o estado do timer salvo, descontando o tempo decorrido enquanto fechado
+function loadSavedTimerState() {
+  try {
+    const raw = localStorage.getItem('timer-state')
+    if (!raw) return null
+    const saved = JSON.parse(raw)
+    if (!saved.phase || saved.phase === 'idle' || saved.phase === 'done') return null
+    const elapsed = Math.floor((Date.now() - saved.savedAt) / 1000)
+    const remaining = Math.max(0, saved.remaining - elapsed)
+    return { ...saved, remaining, running: false }
+  } catch {
+    return null
+  }
+}
+
 export function TimerProvider({ children }) {
   // --- Estados de Configuração e Persistência ---
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'pomodoro')
@@ -26,12 +41,20 @@ export function TimerProvider({ children }) {
   })
 
   // --- Estados de Controle do Cronômetro (Mudam frequentemente) ---
-  const [phase, setPhase] = useState('idle')
-  const [currentLoop, setCurrentLoop] = useState(0)
-  const [remaining, setRemaining] = useState(25 * 60)
-  const [total, setTotal] = useState(25 * 60)
+  const savedTimerRef = useRef(loadSavedTimerState())
+  const _s = savedTimerRef.current
+  const [phase, setPhase] = useState(_s?.phase ?? 'idle')
+  const [currentLoop, setCurrentLoop] = useState(_s?.currentLoop ?? 0)
+  const [remaining, setRemaining] = useState(_s?.remaining ?? 25 * 60)
+  const [total, setTotal] = useState(_s?.total ?? 25 * 60)
   const [running, setRunning] = useState(false)
-  const [message, setMessage] = useState('Configure e inicie sua sessão')
+  const [message, setMessage] = useState(
+    _s
+      ? _s.remaining <= 0
+        ? 'Tempo esgotado enquanto fechado. Retome ou cancele.'
+        : 'Sessão pausada. Retome quando quiser.'
+      : 'Configure e inicie sua sessão'
+  )
   const [batteryAlert, setBatteryAlert] = useState(false)
 
   const intervalRef = useRef(null)
@@ -103,6 +126,18 @@ export function TimerProvider({ children }) {
   useEffect(() => {
     stateRef.current = { phase, currentLoop, loops, minutes, remaining, running }
   }, [phase, currentLoop, loops, minutes, remaining, running])
+
+  // Persiste o estado do timer no localStorage para restaurar ao reabrir
+  useEffect(() => {
+    if (phase === 'idle' || phase === 'done') {
+      localStorage.removeItem('timer-state')
+      return
+    }
+    localStorage.setItem(
+      'timer-state',
+      JSON.stringify({ phase, currentLoop, remaining, total, message, savedAt: Date.now() })
+    )
+  }, [phase, currentLoop, remaining, total, message])
 
   useEffect(() => {
     if (!api?.onMudancaEnergia) return
