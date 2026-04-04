@@ -226,7 +226,16 @@ ipcMain.handle('parar-foco', () => {
 })
 
 ipcMain.on('show-notification', (event, { title, body }) => {
-  new Notification({ title, body, icon: nativeImage.createFromPath(icon) }).show()
+  const win = BrowserWindow.getFocusedWindow()
+  const isFocused = win?.isFocused()
+
+  if (!isFocused) {
+    new Notification({
+      title,
+      body,
+      icon: nativeImage.createFromPath(icon)
+    }).show()
+  }
 })
 
 ipcMain.on('play-sound', () => {
