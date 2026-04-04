@@ -38,3 +38,13 @@ if (process.contextIsolated) {
   window.menuAPI = apiMenu
   window.themeAPI = apiTheme
 }
+
+const apiSound = {
+  getCustomSound: () => ipcRenderer.invoke('get-custom-sound')
+}
+
+if (process.contextIsolated) {
+  contextBridge.exposeInMainWorld('soundAPI', apiSound)
+} else {
+  window.soundAPI = apiSound
+}
