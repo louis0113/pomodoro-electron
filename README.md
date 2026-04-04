@@ -1,129 +1,162 @@
-# 🍅 Pomodoro Timer (Electron)
+# Pomodoro Electron
 
-Aplicação desktop de **Pomodoro Timer** desenvolvida com **Electron**, **HTML**, **CSS** e **JavaScript**.  
-O objetivo do projeto é ajudar na **gestão de tempo e produtividade** utilizando a técnica Pomodoro.
-
----
-
-## 📌 Sobre o Projeto
-
-O **Pomodoro Timer** é uma aplicação simples que permite controlar ciclos de trabalho e descanso com base na técnica Pomodoro.
-
-A técnica funciona da seguinte forma:
-
-1. Trabalhar por **25 minutos**
-2. Fazer uma pausa curta de **5 minutos**
-3. Após **4 ciclos**, fazer uma pausa maior
-
-Este projeto roda como uma **aplicação desktop** utilizando o framework **Electron**.
+Aplicação desktop de **Pomodoro Timer** desenvolvida com **Electron**, **React** e **Vite**.  
+Projetada para ajudar na **gestão de tempo e produtividade** utilizando a técnica Pomodoro, com suporte a múltiplos temas, janela de configurações separada, histórico de sessões e notificações de sistema.
 
 ---
 
-## 🚀 Tecnologias Utilizadas
+## Sobre o Projeto
 
-- Electron
-- JavaScript
-- HTML
-- CSS
-- Node.js
+O **Pomodoro Timer** alterna automaticamente entre ciclos de foco e descanso, com controle total via interface gráfica.
+
+Fluxo padrão:
+
+1. Iniciar sessão de **foco** (padrão: 25 min)
+2. Pausa automática de **descanso** (padrão: 5 min)
+3. Repetir conforme o número de **loops** configurados
+4. Ao completar todos os ciclos, sessão encerrada com notificação
 
 ---
 
-## 📂 Estrutura do Projeto
+## Tecnologias
+
+- [Electron](https://www.electronjs.org/) — framework desktop
+- [React 19](https://react.dev/) — interface declarativa
+- [Vite](https://vite.dev/) via [electron-vite](https://electron-vite.org/) — build e dev server
+- [Sequelize](https://sequelize.org/) + [PostgreSQL](https://www.postgresql.org/) — persistência de dados
+- [electron-builder](https://www.electron.build/) — empacotamento e distribuição
+
+---
+
+## Estrutura do Projeto
 
 ```text
-pomodoro-electron
-│
-├── src
-│   ├── index.html
-│   ├── renderer.js
-│   ├── style.css
-│
-├── main.js
-├── preload.js
-├── package.json
-└── README.md
+pomodoro-electron/
+├── src/
+│   ├── main/              # Processo principal do Electron (IPC, janelas, sessão)
+│   ├── preload/           # Scripts de preload (bridges IPC expostas ao renderer)
+│   ├── renderer/
+│   │   └── src/
+│   │       ├── components/
+│   │       │   ├── Buttons/       # Botões de controle (start, stop, cancel, settings...)
+│   │       │   ├── Selects/       # Selects de configuração (temas, minutos, loops)
+│   │       │   ├── Template/      # Componentes base de layout
+│   │       │   ├── Calendar.jsx   # Histórico visual de sessões
+│   │       │   ├── Config.jsx     # Painel de configurações
+│   │       │   ├── History.jsx    # Lista de histórico
+│   │       │   ├── Options.jsx    # Opções de sessão
+│   │       │   ├── Timer.jsx      # Display principal do cronômetro
+│   │       │   ├── Window.jsx     # Frame da janela (controles minimize/max/close)
+│   │       │   └── WindowControls.jsx
+│   │       ├── context/
+│   │       │   └── TimerContext.jsx  # Context API com estado global separado (state/config/actions)
+│   │       ├── hooks/
+│   │       │   └── useSound.js    # Hook para sons de transição entre fases
+│   │       ├── services/
+│   │       │   └── soundService.js
+│   │       ├── App.jsx            # Raiz da aplicação (janela principal)
+│   │       ├── settings.jsx       # Raiz da janela de configurações
+│   │       └── WindowSettings.jsx
+│   └── models/            # Modelos Sequelize
+├── resources/             # Recursos estáticos (ícones, sons)
+├── build/                 # Assets para empacotamento
+├── electron.vite.config.mjs
+├── electron-builder.json
+└── package.json
 ```
 
 ---
 
-## ⚙️ Funcionalidades
+## Funcionalidades
 
-- ✅ Iniciar Pomodoro
-- ⏸️ Pausar temporizador
-- ❌ Cancelar ciclo
-- 🔄 Alternar entre tempo de trabalho e descanso
-- 🖥️ Interface simples e intuitiva
-- 📦 Aplicação desktop
+- Iniciar, pausar, retomar e cancelar sessão Pomodoro
+- Alternância automática entre fases de foco e descanso
+- Configuração de duração de foco e descanso
+- Configuração do número de loops por sessão
+- Múltiplos temas visuais
+- Janela de configurações separada com sincronização via IPC
+- Histórico de sessões persistido em `localStorage`
+- Calendário visual de produtividade
+- Notificações de sistema ao fim de cada fase
+- Sons de transição entre fases (foco, descanso, sessão completa)
+- Alerta de bateria (avisa quando rodando em energia de bateria)
+- Controles nativos de janela personalizados (minimizar, maximizar, fechar)
 
 ---
 
-## ▶️ Como Executar o Projeto
+## Como Executar
+
+### Pré-requisitos
+
+- [Node.js](https://nodejs.org/) >= 18
+- [pnpm](https://pnpm.io/)
 
 ### 1. Clonar o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/pomodoro-electron.git
-```
-
-### 2. Entrar na pasta do projeto
-
-```bash
+git clone https://github.com/louis0113/pomodoro-electron.git
 cd pomodoro-electron
 ```
 
-### 3. Instalar dependências
+### 2. Instalar dependências
 
 ```bash
-npm install
+pnpm install
 ```
 
-### 4. Executar o projeto
+### 3. Executar em modo de desenvolvimento
 
 ```bash
-npm start
+pnpm dev
 ```
 
----
-
-## 📦 Gerar Build da Aplicação
-
-Para gerar uma versão empacotada da aplicação:
+### 4. Pré-visualizar o build
 
 ```bash
-npm run make
-```
-
-ou
-
-```bash
-npm run package
+pnpm start
 ```
 
 ---
 
-## 🧠 Técnica Pomodoro
+## Gerar Build
 
-A técnica Pomodoro foi criada por **Francesco Cirillo** e é amplamente utilizada para melhorar foco e produtividade.
+```bash
+# Build para a plataforma atual
+pnpm build
+
+# Empacotamento sem instalador (diretório)
+pnpm build:unpack
+
+# Windows (NSIS installer + portable)
+pnpm build:win
+
+# macOS (DMG universal)
+pnpm build:mac
+
+# Linux (AppImage + .deb)
+pnpm build:linux
+```
+
+Os artefatos são gerados na pasta `dist/`.
 
 ---
 
-## 🎨 Melhorias Futuras
+## Distribuição
 
-- 🔔 Notificações ao terminar um ciclo
-- 🎵 Sons de alerta
-- 📊 Estatísticas de produtividade
-- 🌙 Modo escuro
-- 🎨 Temas personalizáveis
-
----
-
-## 📜 Licença
-
-Este projeto está sob a licença **MIT**.
+| Plataforma | Formatos |
+|------------|----------|
+| Windows    | NSIS installer (x64, arm64), Portable (x64, arm64) |
+| macOS      | DMG Universal |
+| Linux      | AppImage (x64, arm64), .deb (x64, arm64) |
 
 ---
 
-## 👨‍💻 Autor
+## Licença
 
-**Luiz Henrique**
+Este projeto está sob a licença **MIT**. Consulte o arquivo [LICENSE.md](LICENSE.md) para mais detalhes.
+
+---
+
+## Autor
+
+**Luiz Henrique** — [lhrds0113@proton.me](mailto:lhrds0113@proton.me)
