@@ -14,15 +14,11 @@ function WindowControls() {
   }, [])
 
   return (
-    <>
-      <div className="window">
-        <div className={`window-controls${isMaximized ? '' : ' window-controls--compact'}`}>
-          <ButtonMin />
-          <ButtonMax />
-          <ButtonClose />
-        </div>
-      </div>
-    </>
+    <div className={`window-controls${isMaximized ? '' : ' window-controls--compact'}`}>
+      <ButtonMin />
+      <ButtonMax />
+      <ButtonClose />
+    </div>
   )
 }
 

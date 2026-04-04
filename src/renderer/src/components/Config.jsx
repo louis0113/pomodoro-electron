@@ -9,6 +9,7 @@ function Config() {
   const { theme, setTheme, minutes, setMinutes, loops, setLoops, running } = useTimer()
   const [apiKey, setApiKey] = useState('')
   const [debugMode, setDebugMode] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     window.settingsAPI?.get().then((settings) => {
@@ -30,55 +31,83 @@ function Config() {
     }
     window.settingsAPI?.set(newSettings)
     window.themeAPI?.sendSettings(newSettings)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
   }
 
   return (
     <div className="settings-config">
-      <WindowControls />
-      <div className="settings-config__inner">
-        <span className="settings-config__section-label">Timer</span>
-        <Minutes value={minutes} onChange={setMinutes} disabled={running} />
-        <Times value={String(loops)} onChange={(v) => setLoops(Number(v))} disabled={running} />
+      <div className="settings-config__titlebar">
+        <span className="settings-config__title">Configurações</span>
+        <WindowControls />
+      </div>
 
-        <div className="settings-config__divider" />
+      <div className="settings-config__body">
+        <div className="settings-config__inner">
 
-        <span className="settings-config__section-label">Aparência</span>
-        <Themes theme={theme} setTheme={setTheme} />
+          <section className="settings-config__section">
+            <span className="settings-config__section-label">Timer</span>
+            <div className="settings-config__group">
+              <Minutes value={minutes} onChange={setMinutes} disabled={running} />
+              <Times value={String(loops)} onChange={(v) => setLoops(Number(v))} disabled={running} />
+            </div>
+            {running && (
+              <p className="settings-config__warning">
+                Sessão em andamento — configurações de timer desabilitadas
+              </p>
+            )}
+          </section>
 
-        <div className="settings-config__divider" />
+          <section className="settings-config__section">
+            <span className="settings-config__section-label">Aparência</span>
+            <div className="settings-config__group">
+              <Themes theme={theme} setTheme={setTheme} />
+            </div>
+          </section>
 
-        <span className="settings-config__section-label">Freesound API Key</span>
-        <input
-          type="text"
-          className="settings-config__input"
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-          placeholder="Insira sua API key"
-        />
+          <section className="settings-config__section">
+            <span className="settings-config__section-label">Freesound API Key</span>
+            <input
+              type="text"
+              className="settings-config__input"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="Insira sua API key"
+              spellCheck={false}
+            />
+            <p className="settings-config__hint">
+              Utilizada para sons personalizados via FreeSound API
+            </p>
+          </section>
 
-        <div className="settings-config__divider" />
+          <section className="settings-config__section">
+            <span className="settings-config__section-label">Avançado</span>
+            <label className="settings-config__checkbox-row">
+              <input
+                type="checkbox"
+                className="settings-config__checkbox"
+                checked={debugMode}
+                onChange={(e) => setDebugMode(e.target.checked)}
+              />
+              <span className="settings-config__checkbox-label">
+                <span>Modo debug</span>
+                <span className="settings-config__hint-inline">Exibe botões de depuração</span>
+              </span>
+            </label>
+          </section>
 
-        <span className="settings-config__section-label">Debug</span>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <input
-            type="checkbox"
-            className="settings-config__checkbox"
-            checked={debugMode}
-            onChange={(e) => setDebugMode(e.target.checked)}
-          />
-          Ativar modo debug
-        </label>
-
-        <button className="settings-config__button" onClick={handleSave}>
-          Salvar Configurações
-        </button>
-
-        <div className="settings-config__footer">
-          <span className={`settings-config__footer-status ${running ? 'active' : ''}`}>
-            {running ? '● em execução' : '● pausado'}
-          </span>
-          <span className="settings-config__footer-status">v1.0.0</span>
         </div>
+      </div>
+
+      <div className="settings-config__footer">
+        <span className={`settings-config__footer-status ${running ? 'active' : ''}`}>
+          <span className="settings-config__footer-dot" />
+          {running ? 'em execução' : 'pausado'}
+        </span>
+        <button className={`settings-config__button ${saved ? 'saved' : ''}`} onClick={handleSave}>
+          {saved ? '✓ Salvo' : 'Salvar'}
+        </button>
+        <span className="settings-config__footer-version">v1.0.0</span>
       </div>
     </div>
   )

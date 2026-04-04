@@ -42,10 +42,10 @@ function createSettingsWindow() {
   secondaryWindow = new BrowserWindow({
     parent: mainWindow,
     show: false,
-    width: 500,
-    height: 620,
-    minWidth: 350,
-    minHeight: 450,
+    width: 580,
+    height: 760,
+    minWidth: 440,
+    minHeight: 600,
     frame: false,
     transparent: true,
     webPreferences: {

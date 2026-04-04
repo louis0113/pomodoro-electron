@@ -9,23 +9,21 @@
   padding: 0;
 }
 
-/* ── Layout da Janela (Sincronizado com Main) ────── */
+/* ── Layout raiz ─────────────────────────────────── */
 .settings-config {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100vh;
-  background-color: var(--color-bg); /* Sincronizado com o tema atual */
+  background-color: var(--color-bg);
   color: var(--color-text);
   overflow: hidden;
-  scrollbar-width: none;
   position: relative;
   transition: background 0.45s cubic-bezier(0.23, 1, 0.32, 1);
   border: 1px solid var(--glass-border);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
-/* Efeito de ruído fractal idêntico ao main.css */
+/* Ruído fractal */
 .settings-config::before {
   content: '';
   position: fixed;
@@ -36,28 +34,35 @@
   opacity: 0.45;
 }
 
-.settings-config::-webkit-scrollbar {
-  display: none;
-}
-
-/* ── Barra de Título (Miniaturizada) ─────────────── */
-.settings-config .window {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  height: 40px; /* Barra fina e elegante */
+/* ── Titlebar ─────────────────────────────────────── */
+.settings-config__titlebar {
+  position: relative;
+  z-index: 100;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding: 0 12px;
-  z-index: 100;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 16px 0 20px;
+  flex-shrink: 0;
   backdrop-filter: var(--glass-blur, blur(24px)) saturate(160%);
   -webkit-backdrop-filter: var(--glass-blur, blur(24px)) saturate(160%);
-  background: var(--glass-bg-dark, rgba(0, 0, 0, 0.2));
+  background: var(--glass-bg-dark, rgba(0, 0, 0, 0.25));
   border-bottom: 0.5px solid var(--glass-border);
   -webkit-app-region: drag;
 }
 
+.settings-config__title {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-text);
+  opacity: 0.55;
+  -webkit-app-region: drag;
+}
+
+/* ── Window Controls ─────────────────────────────── */
 .settings-config .window-controls {
   display: flex;
   gap: 6px;
@@ -65,15 +70,15 @@
 }
 
 .settings-config .window-controls button {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-full);
   border: 0.5px solid rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: var(--color-text-muted);
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,13 +87,13 @@
 }
 
 .settings-config .window-controls--compact {
-  gap: 4px;
+  gap: 5px;
 }
 
 .settings-config .window-controls--compact button {
-  width: 16px;
-  height: 16px;
-  font-size: 0.48rem;
+  width: 24px;
+  height: 24px;
+  font-size: 0.62rem;
 }
 
 .settings-config .window-controls button:active {
@@ -116,32 +121,50 @@
   box-shadow: 0 0 10px rgba(231, 76, 60, 0.2);
 }
 
-/* ── Conteúdo Interno e Resize ───────────────────── */
-.settings-config__inner {
+/* ── Body (área rolável) ─────────────────────────── */
+.settings-config__body {
   position: relative;
   z-index: 1;
-  width: 100%;
-  max-width: 420px;
-  min-width: 320px; /* Limite de resize horizontal */
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 12px 24px 32px 24px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
 }
 
-/* ── Rótulos de Seção com Glow ───────────────────── */
+.settings-config__body::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Inner container ─────────────────────────────── */
+.settings-config__inner {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 8px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ── Seções ──────────────────────────────────────── */
+.settings-config__section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 0 4px;
+}
+
 .settings-config__section-label {
   font-family: var(--font-display);
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   font-weight: 900;
-  letter-spacing: 3.5px;
+  letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--color-accent);
-  margin: 24px 0 6px 4px;
+  margin-bottom: 4px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   text-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
 
@@ -152,120 +175,31 @@
   background: linear-gradient(90deg, var(--glass-border), transparent);
 }
 
-/* ── Componente de Seleção (Select) ──────────────── */
-.select-row {
+/* ── Grupo de itens ──────────────────────────────── */
+.settings-config__group {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 50px;
-  padding: 0 18px;
-  border-radius: var(--radius-md, 10px);
-  border: 1px solid var(--glass-border);
-  background: var(--glass-bg);
-  position: relative;
-  transition: all 0.3s ease;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.select-row:hover:not(:has(select:disabled)) {
-  background: var(--glass-bg-mid);
-  border-color: var(--color-accent);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  transform: translateY(-1px);
-}
-
-.select-row label {
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  font-weight: 500;
-  opacity: 0.9;
-}
-
-.select-row select {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-  z-index: 2;
-  background-color: var(--color-bg-dark); /* Evita flash branco ao abrir */
-  appearance: none;
-  -webkit-appearance: none;
-}
-
-.select-row::after {
-  content: '▾';
+/* ── Aviso (timer em execução) ───────────────────── */
+.settings-config__warning {
+  font-size: 0.75rem;
   color: var(--color-accent);
-  font-size: 0.8rem;
-  opacity: 0.5;
-  transition: transform 0.2s ease;
+  opacity: 0.7;
+  padding: 0 4px;
 }
 
-.select-row:focus-within::after {
-  transform: rotate(180deg);
-  opacity: 1;
-}
-
-/* ── Estilização de Elite para Options ──────────────── */
-
-.select-row__option {
-  /* Fundo baseado na cor de superfície do main.css */
-  background-color: var(--color-bg-dark, #0b0e12) !important;
+/* ── Hint ────────────────────────────────────────── */
+.settings-config__hint {
+  font-size: 0.75rem;
   color: var(--color-text-muted);
-
-  /* Tipografia: Espaçamento de letra e peso médio para ar moderno */
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-
-  /* Padding interno maior para dar "respiro" ao texto */
-  padding: 16px 14px;
-
-  /* Remove a borda padrão do SO onde possível */
-  border: none;
-  outline: none;
+  opacity: 0.65;
+  padding: 0 4px;
+  line-height: 1.5;
 }
 
-/* Quando o usuário passa o mouse ou usa o teclado */
-.select-row__option:hover,
-.select-row__option:focus {
-  background-color: color-mix(in srgb, var(--color-accent) 15%, #1a1d23) !important;
-  color: var(--color-accent) !important;
-}
-
-/* O item selecionado ganha o brilho (glow) característico do seu app */
-.select-row__option:checked {
-  background-color: var(--color-accent) !important;
-  color: #ffffff !important;
-  font-weight: 700;
-  /* Simula o glow do main.css */
-  box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.1);
-}
-
-/* ── Refinamento do Container (Select) ─────────────── */
-
-.select-row select {
-  /* Garante que o texto dentro do card fechado seja elegante */
-  font-family: var(--font-display);
-  font-weight: 600;
-  color: var(--color-text);
-
-  /* Prevenção de flash branco ao clicar */
-  background: transparent;
-}
-
-/* Estilo para navegadores que suportam estilização de scroll no dropdown */
-.select-row select::-webkit-scrollbar {
-  width: 4px;
-}
-
-.select-row select::-webkit-scrollbar-thumb {
-  background: var(--glass-border);
-  border-radius: 10px;
-}
-
-/* ── Dropdown Customizado (estilo Zoom) ──────────── */
+/* ── Dropdown customizado ────────────────────────── */
 .dropdown-row {
   position: relative;
   border-radius: var(--radius-md, 10px);
@@ -293,7 +227,7 @@
 
 .dropdown-row__trigger {
   width: 100%;
-  height: 50px;
+  height: 54px;
   padding: 0 18px;
   display: flex;
   align-items: center;
@@ -310,7 +244,7 @@
 }
 
 .dropdown-row__label {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 500;
   opacity: 0.9;
 }
@@ -347,7 +281,7 @@
   top: calc(100% + 4px);
   left: 0;
   right: 0;
-  z-index: 50;
+  z-index: 200;
   list-style: none;
   background: var(--color-bg, #0b0e12);
   border: 1px solid var(--glass-border);
@@ -360,9 +294,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 18px;
+  padding: 14px 18px;
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 500;
   color: var(--color-text-muted);
   cursor: pointer;
@@ -384,37 +318,10 @@
   color: var(--color-accent);
 }
 
-/* ── Divisores e Rodapé ───────────────────────────── */
-.settings-config__divider {
-  height: 0.5px;
-  width: 100%;
-  background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
-  margin: 12px 0;
-  border: none;
-}
-
-.settings-config__footer {
-  margin-top: auto;
-  padding: 32px 4px 8px 4px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  opacity: 0.5;
-  font-family: var(--font-display);
-  font-size: 0.6rem;
-  letter-spacing: 1px;
-}
-
-.settings-config__footer-status.active {
-  color: var(--color-accent);
-  font-weight: bold;
-  text-shadow: 0 0 10px var(--color-accent);
-  opacity: 1;
-}
-
+/* ── Input ───────────────────────────────────────── */
 .settings-config__input {
   width: 100%;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-radius: var(--radius-md, 10px);
   border: 1px solid var(--glass-border);
   background: var(--glass-bg);
@@ -426,43 +333,55 @@
 
 .settings-config__input::placeholder {
   color: var(--color-text-muted);
-  opacity: 0.7;
+  opacity: 0.5;
 }
 
 .settings-config__input:focus {
   outline: none;
   border-color: var(--color-accent);
   background: var(--glass-bg-mid);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 40%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 15%, transparent);
 }
 
-.settings-config__button {
-  margin-top: 8px;
-  padding: 10px 16px;
+/* ── Checkbox row ────────────────────────────────── */
+.settings-config__checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
   border-radius: var(--radius-md, 10px);
-  border: none;
-  background: var(--color-accent);
-  color: #fff;
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 
-.settings-config__button:hover {
-  background: color-mix(in srgb, var(--color-accent) 80%, #000);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+.settings-config__checkbox-row:hover {
+  background: var(--glass-bg-mid);
+  border-color: var(--color-accent);
 }
 
-.settings-config__button:active {
-  transform: translateY(0);
-  box-shadow: none;
+.settings-config__checkbox-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-config__checkbox-label > span:first-child {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-text);
+  opacity: 0.9;
+}
+
+.settings-config__hint-inline {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  opacity: 0.6;
 }
 
 .settings-config__checkbox {
+  flex-shrink: 0;
   appearance: none;
   -webkit-appearance: none;
   width: 20px;
@@ -473,12 +392,6 @@
   cursor: pointer;
   position: relative;
   transition: all 0.25s ease;
-}
-
-.settings-config__checkbox:hover {
-  background: var(--glass-bg-mid);
-  border-color: var(--color-accent);
-  box-shadow: 0 0 6px rgba(0,0,0,0.2);
 }
 
 .settings-config__checkbox:checked {
@@ -493,7 +406,150 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -55%);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #fff;
   font-weight: bold;
+}
+
+/* ── Footer ──────────────────────────────────────── */
+.settings-config__footer {
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 56px;
+  border-top: 0.5px solid var(--glass-border);
+  background: var(--glass-bg-dark, rgba(0, 0, 0, 0.15));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.settings-config__footer-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+.settings-config__footer-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.settings-config__footer-status.active {
+  color: var(--color-accent);
+  opacity: 1;
+  text-shadow: 0 0 8px var(--color-accent);
+}
+
+.settings-config__footer-status.active .settings-config__footer-dot {
+  box-shadow: 0 0 6px var(--color-accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.settings-config__footer-version {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+  opacity: 0.35;
+}
+
+/* ── Botão Salvar ────────────────────────────────── */
+.settings-config__button {
+  padding: 8px 24px;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-config__button:hover {
+  background: var(--color-accent);
+  color: #fff;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--color-accent) 40%, transparent);
+  transform: translateY(-1px);
+}
+
+.settings-config__button:active {
+  transform: translateY(0);
+}
+
+.settings-config__button.saved {
+  background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 25%, transparent);
+}
+
+/* ── Select nativo (legado) ──────────────────────── */
+.select-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 54px;
+  padding: 0 18px;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.select-row:hover:not(:has(select:disabled)) {
+  background: var(--glass-bg-mid);
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.select-row label {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.select-row select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+  background-color: var(--color-bg-dark);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.select-row::after {
+  content: '▾';
+  color: var(--color-accent);
+  font-size: 0.8rem;
+  opacity: 0.5;
+  transition: transform 0.2s ease;
+}
+
+.select-row:focus-within::after {
+  transform: rotate(180deg);
+  opacity: 1;
 }

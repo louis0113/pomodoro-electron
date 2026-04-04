@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import ButtonMin from './Buttons/ButtonMin'
-import ButtonMax from './Buttons/ButtonMax'
-import ButtonClose from './Buttons/ButtonClose'
+import WindowControls from './WindowControls'
 import ButtonDebug from './Buttons/ButtonDebug'
 import ButtonHelp from './Buttons/ButtonHelp'
 import ButtonZoom from './Buttons/ButtonZoom'
@@ -101,9 +99,7 @@ function Window() {
             </svg>
           </button>
 
-          <ButtonMin />
-          <ButtonMax />
-          <ButtonClose />
+          <WindowControls />
         </div>
       </div>
 

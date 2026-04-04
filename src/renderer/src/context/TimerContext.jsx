@@ -137,7 +137,15 @@ export function TimerProvider({ children }) {
 
     if (p === 'focus') {
       addHistoryEntry()
-      const nextLoop = cl + 1
+      setCurrentLoop(cl + 1)
+      setPhase('break')
+      setRemaining(brk)
+      setTotal(brk)
+      setMessage('Hora de descansar!')
+      notify?.send('Pomodoro', 'Foco concluído! Hora de descansar.')
+      playSound('FOCUS_TO_BREAK')
+    } else {
+      const nextLoop = cl
       if (nextLoop >= l) {
         clearTimer()
         setRunning(false)
@@ -148,21 +156,13 @@ export function TimerProvider({ children }) {
         playSound('SESSION_COMPLETE')
         api?.pararSessao()
       } else {
-        setCurrentLoop(nextLoop)
-        setPhase('break')
-        setRemaining(brk)
-        setTotal(brk)
-        setMessage('Hora de descansar!')
-        notify?.send('Pomodoro', 'Foco concluído! Hora de descansar.')
-        playSound('FOCUS_TO_BREAK')
+        setPhase('focus')
+        setRemaining(focus)
+        setTotal(focus)
+        setMessage('Sessão de foco em andamento...')
+        notify?.send('Pomodoro', 'Pausa concluída! De volta ao foco.')
+        playSound('BREAK_TO_FOCUS')
       }
-    } else {
-      setPhase('focus')
-      setRemaining(focus)
-      setTotal(focus)
-      setMessage('Sessão de foco em andamento...')
-      notify?.send('Pomodoro', 'Pausa concluída! De volta ao foco.')
-      playSound('BREAK_TO_FOCUS')
     }
   }, [clearTimer, api, notify, playSound, parseTime, addHistoryEntry])
 
