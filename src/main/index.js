@@ -19,7 +19,11 @@ import fs from 'fs'
 import path from 'path'
 import os from 'os'
 
+// Carrega variáveis de ambiente do .env
 dotenv.config()
+
+// Variável global para armazenar o token FreeSound
+const freesoundToken = process.env.REACT_APP_FREESOUND_TOKEN || ''
 
 export let mainWindow = null
 export let secondaryWindow = null
@@ -38,11 +42,10 @@ function createSettingsWindow() {
   secondaryWindow = new BrowserWindow({
     parent: mainWindow,
     show: false,
-    width: 450,
-    height: 550,
+    width: 500,
+    height: 620,
     minWidth: 350,
     minHeight: 450,
-    maxWidth: 600,
     frame: false,
     transparent: true,
     webPreferences: {
@@ -57,6 +60,14 @@ function createSettingsWindow() {
 
   secondaryWindow.once('ready-to-show', () => {
     secondaryWindow.show()
+  })
+
+  secondaryWindow.on('maximize', () => {
+    secondaryWindow.webContents.send('window-maximize-changed', true)
+  })
+
+  secondaryWindow.on('unmaximize', () => {
+    secondaryWindow.webContents.send('window-maximize-changed', false)
   })
 
   secondaryWindow.on('closed', () => {
@@ -205,9 +216,15 @@ ipcMain.on('menu-comando', (event, comando) => {
 
 ipcMain.on('update-settings', (event, settings) => {
   for (const win of BrowserWindow.getAllWindows()) {
-    if (!win.isDestroyed()) {
+    if (!win.isDestroyed() && win.webContents !== event.sender) {
       win.webContents.send('settings-changed', settings)
     }
+  }
+})
+
+ipcMain.on('send-timer-state', (event, state) => {
+  if (secondaryWindow && !secondaryWindow.isDestroyed()) {
+    secondaryWindow.webContents.send('timer-state', state)
   }
 })
 
@@ -318,6 +335,11 @@ ipcMain.on('play-sound', () => {
 })
 
 ipcMain.handle('get-custom-sound', () => customSoundPath)
+
+// IPC handler para obter token FreeSound
+ipcMain.handle('get-freesound-token', () => {
+  return freesoundToken
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

@@ -1,8 +1,8 @@
-import { useTimer } from '../../context/TimerContext'
+import { useTimerActions } from '../../context/TimerContext'
 import Button from '../Template/Button'
 
 function ButtonCancel({ disabled }) {
-  const { cancelSession } = useTimer()
+  const { cancelSession } = useTimerActions()
 
   return <Button className="btn-cancel" value="Cancelar" func={cancelSession} disabled={disabled} />
 }

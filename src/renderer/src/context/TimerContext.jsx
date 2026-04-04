@@ -1,7 +1,12 @@
-import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react'
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import PropTypes from 'prop-types'
 import { useSound } from '../hooks/useSound'
 
-const TimerContext = createContext(null)
+// Contextos separados para otimizar re-renders
+const TimerStateContext = createContext(null)
+const TimerConfigContext = createContext(null)
+const TimerActionsContext = createContext(null)
 
 export function TimerProvider({ children }) {
   // --- Estados de Configuração e Persistência ---
@@ -19,8 +24,8 @@ export function TimerProvider({ children }) {
     }
   })
 
-  // --- Estados de Controle do Cronômetro ---
-  const [phase, setPhase] = useState('idle') // idle, focus, break, done
+  // --- Estados de Controle do Cronômetro (Mudam frequentemente) ---
+  const [phase, setPhase] = useState('idle')
   const [currentLoop, setCurrentLoop] = useState(0)
   const [remaining, setRemaining] = useState(25 * 60)
   const [total, setTotal] = useState(25 * 60)
@@ -30,11 +35,12 @@ export function TimerProvider({ children }) {
 
   const intervalRef = useRef(null)
   const stateRef = useRef({})
+  const externalRunningUpdateRef = useRef(false)
 
-  // Atalhos para as APIs do Electron
-  const api = typeof window !== 'undefined' ? window.widgetAPI : null
-  const notify = typeof window !== 'undefined' ? window.notifyAPI : null
-  const themeAPI = typeof window !== 'undefined' ? window.themeAPI : null
+  // Referências estáveis para as APIs do Electron (definidas uma vez pelo preload)
+  const api = useRef(typeof window !== 'undefined' ? window.widgetAPI : null).current
+  const notify = useRef(typeof window !== 'undefined' ? window.notifyAPI : null).current
+  const themeAPI = useRef(typeof window !== 'undefined' ? window.themeAPI : null).current
   const playSound = useSound()
 
   // --- Funções Auxiliares ---
@@ -60,26 +66,23 @@ export function TimerProvider({ children }) {
 
   // --- Efeitos de Sincronização e IPC ---
 
-  // ESCUTA as mudanças vindas da janela Config
   useEffect(() => {
-    if (themeAPI?.onSettings) {
-      themeAPI.onSettings((data) => {
-        if (data.theme) setTheme(data.theme)
-        if (data.minutes) {
-          setMinutes(data.minutes)
-          // Se o timer não estiver rodando, atualiza a interface visual imediatamente
-          if (stateRef.current.phase === 'idle' || !stateRef.current.running) {
-            const { focus } = parseTime(data.minutes)
-            setRemaining(focus)
-            setTotal(focus)
-          }
+    if (!themeAPI?.onSettings) return
+    const cleanup = themeAPI.onSettings((data) => {
+      if (data.theme) setTheme(data.theme)
+      if (data.minutes) {
+        setMinutes(data.minutes)
+        if (stateRef.current.phase === 'idle' || !stateRef.current.running) {
+          const { focus } = parseTime(data.minutes)
+          setRemaining(focus)
+          setTotal(focus)
         }
-        if (data.loops !== undefined) setLoops(Number(data.loops))
-      })
-    }
+      }
+      if (data.loops !== undefined) setLoops(Number(data.loops))
+    })
+    return cleanup
   }, [themeAPI, parseTime])
 
-  // ENVIA as mudanças para o localStorage e para o processo Main (sincronizar outras janelas)
   useEffect(() => {
     localStorage.setItem('theme', theme)
     localStorage.setItem('minutes', minutes)
@@ -90,15 +93,34 @@ export function TimerProvider({ children }) {
     themeAPI?.sendSettings({ theme, minutes, loops })
   }, [theme, minutes, loops, themeAPI])
 
-  // Mantém a referência de estado sincronizada para o setInterval
   useEffect(() => {
     stateRef.current = { phase, currentLoop, loops, minutes, remaining, running }
   }, [phase, currentLoop, loops, minutes, remaining, running])
 
   useEffect(() => {
     if (!api?.onMudancaEnergia) return
-    api.onMudancaEnergia((_event, onBattery) => setBatteryAlert(onBattery))
+    const cleanup = api.onMudancaEnergia((onBattery) => setBatteryAlert(onBattery))
+    return cleanup
   }, [api])
+
+  useEffect(() => {
+    if (externalRunningUpdateRef.current) {
+      externalRunningUpdateRef.current = false
+      return
+    }
+    themeAPI?.sendTimerState({ running })
+  }, [running, themeAPI])
+
+  useEffect(() => {
+    if (!themeAPI?.onTimerState) return
+    const cleanup = themeAPI.onTimerState((data) => {
+      if (data.running !== undefined) {
+        externalRunningUpdateRef.current = true
+        setRunning(data.running)
+      }
+    })
+    return cleanup
+  }, [themeAPI])
 
   // --- Lógica de Execução do Timer ---
 
@@ -114,7 +136,7 @@ export function TimerProvider({ children }) {
     const { focus, brk } = parseTime(m)
 
     if (p === 'focus') {
-      addHistoryEntry() // Salva no histórico ao terminar um foco
+      addHistoryEntry()
       const nextLoop = cl + 1
       if (nextLoop >= l) {
         clearTimer()
@@ -123,7 +145,7 @@ export function TimerProvider({ children }) {
         setRemaining(0)
         setMessage('🎉 Sessão completa! Ótimo trabalho.')
         notify?.send('Pomodoro', 'Sessão completa! Ótimo trabalho.')
-        playSound()
+        playSound('SESSION_COMPLETE')
         api?.pararSessao()
       } else {
         setCurrentLoop(nextLoop)
@@ -132,7 +154,7 @@ export function TimerProvider({ children }) {
         setTotal(brk)
         setMessage('Hora de descansar!')
         notify?.send('Pomodoro', 'Foco concluído! Hora de descansar.')
-        playSound()
+        playSound('FOCUS_TO_BREAK')
       }
     } else {
       setPhase('focus')
@@ -140,7 +162,7 @@ export function TimerProvider({ children }) {
       setTotal(focus)
       setMessage('Sessão de foco em andamento...')
       notify?.send('Pomodoro', 'Pausa concluída! De volta ao foco.')
-      playSound()
+      playSound('BREAK_TO_FOCUS')
     }
   }, [clearTimer, api, notify, playSound, parseTime, addHistoryEntry])
 
@@ -172,7 +194,7 @@ export function TimerProvider({ children }) {
     setRunning(true)
     setMessage('Sessão de foco iniciada!')
     notify?.send('Pomodoro', 'Sessão de foco iniciada!')
-    playSound()
+    playSound('FOCUS_START')
     startInterval()
   }, [running, api, minutes, notify, playSound, startInterval, parseTime])
 
@@ -183,7 +205,7 @@ export function TimerProvider({ children }) {
     setRunning(false)
     setMessage('Sessão de foco parada')
     notify?.send('Pomodoro', 'A sessão de foco foi parada')
-    playSound()
+    playSound('SESSION_STOP')
   }, [running, api, clearTimer, notify, playSound])
 
   const cancelSession = useCallback(async () => {
@@ -196,7 +218,7 @@ export function TimerProvider({ children }) {
     setRemaining(focus)
     setTotal(focus)
     setMessage('Sessão cancelada.')
-    playSound()
+    playSound('SESSION_CANCEL')
   }, [api, clearTimer, minutes, playSound, parseTime])
 
   const resumeSession = useCallback(() => {
@@ -205,36 +227,81 @@ export function TimerProvider({ children }) {
     startInterval()
   }, [phase, startInterval])
 
+  // --- Memoized Values para Contextos Separados ---
+
+  const stateValue = useMemo(
+    () => ({
+      phase,
+      currentLoop,
+      remaining,
+      total,
+      running,
+      message,
+      batteryAlert
+    }),
+    [phase, currentLoop, remaining, total, running, message, batteryAlert]
+  )
+
+  const configValue = useMemo(
+    () => ({
+      theme,
+      setTheme,
+      minutes,
+      setMinutes,
+      loops,
+      setLoops,
+      history
+    }),
+    [theme, minutes, loops, history]
+  )
+
+  const actionsValue = useMemo(
+    () => ({
+      startSession,
+      stopSession,
+      cancelSession,
+      resumeSession
+    }),
+    [startSession, stopSession, cancelSession, resumeSession]
+  )
+
   return (
-    <TimerContext.Provider
-      value={{
-        theme,
-        setTheme,
-        minutes,
-        setMinutes,
-        loops,
-        setLoops,
-        history, // Exportado para o History.jsx
-        phase,
-        running,
-        currentLoop,
-        remaining,
-        total,
-        message,
-        batteryAlert,
-        startSession,
-        stopSession,
-        cancelSession,
-        resumeSession
-      }}
-    >
-      {children}
-    </TimerContext.Provider>
+    <TimerStateContext.Provider value={stateValue}>
+      <TimerConfigContext.Provider value={configValue}>
+        <TimerActionsContext.Provider value={actionsValue}>{children}</TimerActionsContext.Provider>
+      </TimerConfigContext.Provider>
+    </TimerStateContext.Provider>
   )
 }
 
-export function useTimer() {
-  const context = useContext(TimerContext)
-  if (!context) throw new Error('useTimer deve ser usado dentro de um TimerProvider')
+TimerProvider.propTypes = {
+  children: PropTypes.node.isRequired
+}
+
+function useTimerState() {
+  const context = useContext(TimerStateContext)
+  if (!context) throw new Error('useTimerState deve ser usado dentro de um TimerProvider')
   return context
 }
+
+function useTimerConfig() {
+  const context = useContext(TimerConfigContext)
+  if (!context) throw new Error('useTimerConfig deve ser usado dentro de um TimerProvider')
+  return context
+}
+
+function useTimerActions() {
+  const context = useContext(TimerActionsContext)
+  if (!context) throw new Error('useTimerActions deve ser usado dentro de um TimerProvider')
+  return context
+}
+
+// Hook compatível com versão anterior (combina tudo)
+export function useTimer() {
+  const state = useTimerState()
+  const config = useTimerConfig()
+  const actions = useTimerActions()
+  return { ...state, ...config, ...actions }
+}
+
+export { useTimerState, useTimerConfig, useTimerActions }

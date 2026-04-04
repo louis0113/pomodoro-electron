@@ -6,7 +6,16 @@ const apiPomodoro = {
   minimizar: () => ipcRenderer.send('minimizar-janela'),
   iniciarSessao: () => ipcRenderer.invoke('iniciar-foco'),
   pararSessao: () => ipcRenderer.invoke('parar-foco'),
-  onMudancaEnergia: (callback) => ipcRenderer.on('alerta-energia', callback)
+  onMudancaEnergia: (callback) => {
+    const handler = (_event, onBattery) => callback(onBattery)
+    ipcRenderer.on('alerta-energia', handler)
+    return () => ipcRenderer.removeListener('alerta-energia', handler)
+  },
+  onMaximizeChange: (callback) => {
+    const handler = (_, isMax) => callback(isMax)
+    ipcRenderer.on('window-maximize-changed', handler)
+    return () => ipcRenderer.removeListener('window-maximize-changed', handler)
+  }
 }
 
 const apiNotify = {
@@ -20,7 +29,21 @@ const apiMenu = {
 
 const apiTheme = {
   sendSettings: (settings) => ipcRenderer.send('update-settings', settings),
-  onSettings: (callback) => ipcRenderer.on('settings-changed', (_, data) => callback(data))
+  onSettings: (callback) => {
+    const handler = (_, data) => callback(data)
+    ipcRenderer.on('settings-changed', handler)
+    return () => ipcRenderer.removeListener('settings-changed', handler)
+  },
+  sendTimerState: (state) => ipcRenderer.send('send-timer-state', state),
+  onTimerState: (callback) => {
+    const handler = (_, data) => callback(data)
+    ipcRenderer.on('timer-state', handler)
+    return () => ipcRenderer.removeListener('timer-state', handler)
+  }
+}
+
+const apiConfig = {
+  getFreesoundToken: () => ipcRenderer.invoke('get-freesound-token')
 }
 
 const apiSettings = {
@@ -35,6 +58,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('menuAPI', apiMenu)
     contextBridge.exposeInMainWorld('themeAPI', apiTheme)
     contextBridge.exposeInMainWorld('settingsAPI', apiSettings)
+    contextBridge.exposeInMainWorld('configAPI', apiConfig)
   } catch (error) {
     console.error(error)
   }
@@ -43,6 +67,8 @@ if (process.contextIsolated) {
   window.notifyAPI = apiNotify
   window.menuAPI = apiMenu
   window.themeAPI = apiTheme
+  window.settingsAPI = apiSettings
+  window.configAPI = apiConfig
 }
 
 const apiSound = {
@@ -54,4 +80,3 @@ if (process.contextIsolated) {
 } else {
   window.soundAPI = apiSound
 }
-

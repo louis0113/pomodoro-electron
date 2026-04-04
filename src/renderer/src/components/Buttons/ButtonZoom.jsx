@@ -1,5 +1,4 @@
 import Button from '../Template/Button'
-const api = window.menuAPI
 
 export default function ButtonZoom() {
   return (
@@ -7,10 +6,10 @@ export default function ButtonZoom() {
       className="btn-settings"
       value="Zoom"
       menuOptions={[
-        { label: 'Aumentar zoom', onClick: () => api.send('zoom-in') },
-        { label: 'Diminuir zoom', onClick: () => api.send('zoom-out') },
-        { label: 'Tamanho original', onClick: () => api.send('zoom-reset') },
-        { label: 'Fullscreen', onClick: () => api.send('fullscreen') }
+        { label: 'Aumentar zoom', onClick: () => window.menuAPI?.send('zoom-in') },
+        { label: 'Diminuir zoom', onClick: () => window.menuAPI?.send('zoom-out') },
+        { label: 'Tamanho original', onClick: () => window.menuAPI?.send('zoom-reset') },
+        { label: 'Fullscreen', onClick: () => window.menuAPI?.send('fullscreen') }
       ]}
     />
   )

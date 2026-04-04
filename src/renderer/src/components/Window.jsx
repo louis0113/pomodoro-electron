@@ -16,16 +16,16 @@ function Window() {
   const [debugMode, setDebugMode] = useState(false)
 
   useEffect(() => {
-
-    window.settingsAPI.get().then((settings) => {
-      if (settings.debugMode) setDebugMode(settings.debugMode)
+    window.settingsAPI?.get().then((settings) => {
+      if (settings?.debugMode) setDebugMode(settings.debugMode)
     })
 
-    window.themeAPI.onSettings((settings) => {
+    const cleanup = window.themeAPI?.onSettings((settings) => {
       if (typeof settings.debugMode !== 'undefined') {
         setDebugMode(settings.debugMode)
       }
     })
+    return cleanup
   }, [])
 
   return (

@@ -25,9 +25,7 @@
   "mac": {
     "icon": "build/icon.icns",
     "category": "public.app-category.productivity",
-    "target": [
-      { "target": "dmg", "arch": ["universal"] }
-    ]
+    "target": [{ "target": "dmg", "arch": ["universal"] }]
   },
   "dmg": {
     "contents": [

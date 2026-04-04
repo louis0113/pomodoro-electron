@@ -1,9 +1,9 @@
 import Button from '../Template/Button'
 
-const api = window.widgetAPI
-
 function fechar() {
-  api.pararSessao().finally(() => api.fechar())
+  const api = window.widgetAPI
+  if (!api) return
+  api.pararSessao?.().finally(() => api.fechar())
 }
 
 function ButtonClose() {

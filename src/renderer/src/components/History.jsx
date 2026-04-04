@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import '../assets/css//History.css'
 import PropTypes from 'prop-types'
 import { useTimer } from '../context/TimerContext'
@@ -32,13 +32,23 @@ function getLast7Days() {
 
 export default function History({ onClose }) {
   const { history } = useTimer()
-  const days = getLast7Days()
-  const max = Math.max(...days.map((d) => history[d.key] || 0), 1)
-  const total7 = days.reduce((acc, d) => acc + (history[d.key] || 0), 0)
 
-  const allEntries = Object.entries(history)
-    .sort(([a], [b]) => b.localeCompare(a))
-    .slice(0, 30)
+  const days = useMemo(() => getLast7Days(), [])
+
+  const max = useMemo(() => Math.max(...days.map((d) => history[d.key] || 0), 1), [days, history])
+
+  const total7 = useMemo(
+    () => days.reduce((acc, d) => acc + (history[d.key] || 0), 0),
+    [days, history]
+  )
+
+  const allEntries = useMemo(
+    () =>
+      Object.entries(history)
+        .sort(([a], [b]) => b.localeCompare(a))
+        .slice(0, 30),
+    [history]
+  )
 
   const [tab, setTab] = useState('week')
 

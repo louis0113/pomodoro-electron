@@ -17,7 +17,7 @@
   height: 100vh;
   background-color: var(--color-bg); /* Sincronizado com o tema atual */
   color: var(--color-text);
-  overflow-y: auto;
+  overflow: hidden;
   scrollbar-width: none;
   position: relative;
   transition: background 0.45s cubic-bezier(0.23, 1, 0.32, 1);
@@ -58,38 +58,62 @@
   -webkit-app-region: drag;
 }
 
-.window-controls {
+.settings-config .window-controls {
   display: flex;
   gap: 6px;
   -webkit-app-region: no-drag;
 }
 
-.window-controls button {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  border: none;
-  background: transparent;
+.settings-config .window-controls button {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  border: 0.5px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--color-text-muted);
+  font-size: 0.68rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  opacity: 0.7;
+  transition: all 0.18s ease;
 }
 
-.window-controls button:hover {
-  opacity: 1;
-  background: var(--glass-bg-mid);
-  color: var(--color-text);
-  transform: translateY(-1px);
+.settings-config .window-controls--compact {
+  gap: 4px;
 }
 
-.window-controls .btn-close:hover {
-  background: #e81123 !important;
-  color: white !important;
-  opacity: 1;
+.settings-config .window-controls--compact button {
+  width: 16px;
+  height: 16px;
+  font-size: 0.48rem;
+}
+
+.settings-config .window-controls button:active {
+  transform: scale(0.9);
+}
+
+.settings-config .window-controls .btn-min:hover {
+  background: rgba(255, 214, 10, 0.18);
+  color: #ffd60a;
+  border-color: rgba(255, 214, 10, 0.35);
+  box-shadow: 0 0 10px rgba(255, 214, 10, 0.2);
+}
+
+.settings-config .window-controls .btn-max:hover {
+  background: rgba(39, 174, 96, 0.18);
+  color: #27ae60;
+  border-color: rgba(39, 174, 96, 0.35);
+  box-shadow: 0 0 10px rgba(39, 174, 96, 0.2);
+}
+
+.settings-config .window-controls .btn-close:hover {
+  background: rgba(231, 76, 60, 0.18);
+  color: #e74c3c;
+  border-color: rgba(231, 76, 60, 0.35);
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.2);
 }
 
 /* ── Conteúdo Interno e Resize ───────────────────── */
@@ -239,6 +263,125 @@
 .select-row select::-webkit-scrollbar-thumb {
   background: var(--glass-border);
   border-radius: 10px;
+}
+
+/* ── Dropdown Customizado (estilo Zoom) ──────────── */
+.dropdown-row {
+  position: relative;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.dropdown-row:focus-within {
+  z-index: 100;
+}
+
+.dropdown-row:not(.dropdown-row--disabled):hover {
+  background: var(--glass-bg-mid);
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.dropdown-row--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dropdown-row__trigger {
+  width: 100%;
+  height: 50px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.dropdown-row__trigger:disabled {
+  cursor: not-allowed;
+}
+
+.dropdown-row__label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.dropdown-row__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdown-row__value {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  opacity: 0.85;
+}
+
+.dropdown-row__arrow {
+  color: var(--color-accent);
+  font-size: 0.8rem;
+  opacity: 0.5;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.dropdown-row__arrow.open {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+.dropdown-row__list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  list-style: none;
+  background: var(--color-bg, #0b0e12);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md, 10px);
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.dropdown-row__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dropdown-row__item:hover {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-text);
+}
+
+.dropdown-row__item.selected {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.dropdown-row__check {
+  font-size: 0.75rem;
+  color: var(--color-accent);
 }
 
 /* ── Divisores e Rodapé ───────────────────────────── */

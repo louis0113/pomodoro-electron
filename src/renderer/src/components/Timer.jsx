@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useTimer } from '../context/TimerContext'
 
 function fmt(secs) {
@@ -19,6 +20,8 @@ function Timer() {
   const circumference = 2 * Math.PI * 88
   const progress = total > 0 ? remaining / total : 1
   const offset = circumference * (1 - progress)
+
+  const dotsArray = useMemo(() => Array.from({ length: loops }), [loops])
 
   return (
     <div className="timer">
@@ -54,7 +57,7 @@ function Timer() {
       </div>
 
       <div className="loop-dots">
-        {Array.from({ length: loops }).map((_, i) => (
+        {dotsArray.map((_, i) => (
           <span
             key={i}
             className={`dot ${i < currentLoop ? 'done' : i === currentLoop && phase !== 'idle' && phase !== 'done' ? 'active' : ''}`}

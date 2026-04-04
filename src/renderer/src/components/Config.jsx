@@ -11,7 +11,7 @@ function Config() {
   const [debugMode, setDebugMode] = useState(false)
 
   useEffect(() => {
-    window.settingsAPI.get().then((settings) => {
+    window.settingsAPI?.get().then((settings) => {
       if (settings.freesoundApiKey) setApiKey(settings.freesoundApiKey)
       if (settings.debugMode) setDebugMode(settings.debugMode)
       if (settings.theme) setTheme(settings.theme)
@@ -28,8 +28,8 @@ function Config() {
       minutes,
       loops
     }
-    window.settingsAPI.set(newSettings)
-    window.themeAPI.sendSettings(newSettings)
+    window.settingsAPI?.set(newSettings)
+    window.themeAPI?.sendSettings(newSettings)
   }
 
   return (
