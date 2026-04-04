@@ -32,6 +32,7 @@ export let secondaryWindow = null
 
 let bloqueadorFocoId = null
 let tray = null
+let lastTimerState = { running: false }
 
 Menu.setApplicationMenu(null)
 
@@ -62,6 +63,7 @@ function createSettingsWindow() {
 
   secondaryWindow.once('ready-to-show', () => {
     secondaryWindow.show()
+    secondaryWindow.webContents.send('timer-state', lastTimerState)
   })
 
   secondaryWindow.on('maximize', () => {
@@ -227,6 +229,7 @@ ipcMain.on('update-settings', (event, settings) => {
 })
 
 ipcMain.on('send-timer-state', (event, state) => {
+  lastTimerState = state
   if (secondaryWindow && !secondaryWindow.isDestroyed()) {
     secondaryWindow.webContents.send('timer-state', state)
   }
