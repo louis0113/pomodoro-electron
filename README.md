@@ -75,8 +75,8 @@ pomodoro-electron/
 - Configuração do número de loops por sessão
 - Múltiplos temas visuais
 - Janela de configurações separada com sincronização via IPC
-- Histórico de sessões persistido em `localStorage`
-- Calendário visual de produtividade
+- Histórico de sessões persistido em banco de dados PostgreSQL com fallback para `localStorage`
+- Calendário visual de produtividade com anotações por dia
 - Notificações de sistema ao fim de cada fase
 - Sons de transição entre fases (foco, descanso, sessão completa)
 - Alerta de bateria (avisa quando rodando em energia de bateria)
@@ -157,6 +157,7 @@ Este projeto está sob a licença **MIT**. Consulte o arquivo [LICENSE.md](LICEN
 
 ---
 
-## Autor
+## Autores
 
-**Luiz Henrique** — [lhrds0113@proton.me](mailto:lhrds0113@proton.me)
+- **Luiz Henrique Ferreira** — [lhrds0113@proton.me](mailto:lhrds0113@proton.me)
+- **Matheus Henrique**
