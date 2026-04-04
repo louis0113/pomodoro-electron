@@ -23,7 +23,7 @@ import os from 'os'
 dotenv.config()
 
 // Variável global para armazenar o token FreeSound
-const freesoundToken = process.env.REACT_APP_FREESOUND_TOKEN || ''
+const freesoundToken = process.env.FREESOUND_TOKEN || ''
 
 export let mainWindow = null
 export let secondaryWindow = null
@@ -276,7 +276,7 @@ function loadSettings() {
 
 async function loadCustomSound() {
   const settings = loadSettings()
-  const FREESOUND_API_KEY = settings.freesoundApiKey || null
+  const FREESOUND_API_KEY = settings.freesoundApiKey || freesoundToken || null
 
   if (!FREESOUND_API_KEY) {
     console.log('Nenhuma API key definida, usando som padrão.')

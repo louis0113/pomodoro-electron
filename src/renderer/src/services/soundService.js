@@ -67,7 +67,8 @@ class SoundService {
     try {
       if (typeof window !== 'undefined' && window.settingsAPI?.get) {
         const settings = await window.settingsAPI.get()
-        this.freesoundToken = settings?.freesoundApiKey || ''
+        const envToken = (await window.configAPI?.getFreesoundToken?.()) || ''
+        this.freesoundToken = settings?.freesoundApiKey || envToken
         this.initialized = true
       } else {
         this.initialized = true
